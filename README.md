@@ -7,6 +7,8 @@ This Project is mainly divided into two areas, combustion analysis and intake an
 clone the repository to a directory of your choosing
 `git clone https://github.com/BasicWalker/aiaa-ucf-ramjet.git`
 
-## Combustion
+## [Combustion](combustion)
+the combustion area of focus aims to design and analyze combustion phenomena regarding the ramjet combustion chamber and nozzle 
 
-## Intake
+## [Intake](intake)
+the intake area of focus aims to design and analyze the geometry of the intake in order to supply the combustion chamber with subsonic flow at pressures for efficient combustion

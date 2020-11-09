@@ -1,5 +1,5 @@
 function [mach2, shockAngle] = obliqueShock(mach1, deflectionAngle, gamma)
-%obliqueShock Outputs the weak shock shock angle and upstream mach number
+%obliqueShock Outputs the weak shock shock angle and downstream mach number
 %   inputs:
 %       mach1 (unitless) mach number of flow before shock
 %       deflectionAngle (degrees) half angle from ramp to horizontal
@@ -28,7 +28,7 @@ C = (1 + ((gamma + 1)/2)*mach1^2)*tand(deflectionAngle);
  itr = 25;  % max iteration
  x_1 = sqrt(A);  % initial guess
  for i = 1:itr
-     x = sqrt(A - B/(x_1+C));
+     x = sqrt(A - B/(x_1+C));  % re-arrange cubic function to solve for x
      if abs(x - x_1) < eps()
          break
      end
@@ -39,7 +39,7 @@ theta = acotd(x);  % solve for theta based on iteration result
 
 shockAngle = theta;
 
-% equation 6.17 upstream mach number
+% equation 6.17 downstream mach number
 mach2 = sqrt( (1+(gamma-1)/2*mach1^2)/((gamma*mach1^2*sind(theta)^2)- (gamma - 1)/2)...
     + ( mach1^2*cosd(theta)^2/(1 + (gamma - 1)/2*mach1^2*sind(theta)^2) )) ;
 end

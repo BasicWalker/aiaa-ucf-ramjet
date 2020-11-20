@@ -11,8 +11,8 @@ clc;clear;
 
 %% define variables
 
-defl = [5 10];  % deflection angle array
-n = size(defl,2);  % number of oblique shocks
+delta = [1 2 3 4 5];  % deflection angle array
+n = size(delta,2);  % number of oblique shocks
 gamma = 1.4;  % specific heat ratio for flow
 
 % pre-allocate arrays
@@ -23,6 +23,8 @@ temperature = zeros(n+2,1);  % array for temperature
 density = zeros(n+2,1);  % array for density
 ramp = zeros(n+1,2);  % array for ramp coordinates
 theta = zeros(n,1);  % array for each shock angle formed
+lambda = zeros(n,1);
+phi = zeros(n,1);
 mach_normal = zeros(n,1);  % array for the normal components crossing the oblique wave
 
 %input known terms 
@@ -31,17 +33,14 @@ pressure(1) = 26.5e3;  % freestream static pressure (Pa)
 [~, tempRatio, presRatio, ~, ~] = flowisentropic(gamma, mach(1),'mach');
 stagPressure(1) = pressure(1) * presRatio; 
 
-
 cowl_height = 1.25;  % inner radius for cowl <inches>
-% centerbody_height = 1;  % inner radius for centerbody <inches>
-% isolator_height = cowl_height - centerbody_height;  % height of straight duct section
 
 %% oblique shocks
 % solving for weak oblique shocks (imaginary components signify detached shock)
 for i = 1:n+1
     try
         if i < n+1
-            [~, theta(i)] = obliqueShock(mach(i), defl(i));
+            [~, theta(i)] = obliqueShock(mach(i), delta(i));
             mach_normal(i) = mach(i)*sind(theta(i));
         else
             mach_normal(i) = mach(i);
@@ -51,7 +50,7 @@ for i = 1:n+1
         [~, t_r, p_r, d_r, M, po_r, ~] = flownormalshock(gamma, mach_normal(i), 'mach');
 
         if i < n+1
-            mach(i+1) = M / sind(theta(i) - defl(i));
+            mach(i+1) = M / sind(theta(i) - delta(i));
         else
             mach(i+1) = M;
         end
@@ -68,27 +67,36 @@ end
 %% geometry propogation
 % find spike length by intersecting initial shock with cowl height
 cowl_x = cowl_height / tand(theta(1));
-% 
+
+
+% define delta and theta wrt the horizontal
+phi(1) = delta(1);  % deflection angle wrt to the horizontal
+lambda(1) = theta(1);  
+for i = 2:n
+    phi(i) = delta(i) + phi(i-1);
+    lambda(i) = theta(i) + phi(i-1);
+end
+
 % loop to find additional ramp geometry by intersecting n-shock with ramp
 if n >1  % if there are more than one oblique shock solve for the rest
     for i = 2:n
         % solve for ramp x locations
-        ramp(i,1) = (tand(theta(i))*cowl_x - cowl_height - tand(defl(i-1))*ramp(i-1,1) + ramp(i-1,2))/(tand(theta(i))-tand(defl(i-1)));
+        ramp(i,1) = (tand(lambda(i))*cowl_x - cowl_height - tand(phi(i-1))*ramp(i-1,1) + ramp(i-1,2))/(tand(lambda(i))-tand(phi(i-1)));
         % solve for ramp y locations
-%         ramp(i,2) = tan(theta(i))*(ramp(i,1)-cowl_x)+cowl_height;
-        ramp(i,2) = tand(defl(i-1))*(ramp(i,1)-ramp(i-1,1)) + ramp(i-1,2);
+%         ramp(i,2) = tan(lambda(i))*(ramp(i,1)-cowl_x)+cowl_height;
+        ramp(i,2) = tand(phi(i-1))*(ramp(i,1)-ramp(i-1,1)) + ramp(i-1,2);
     end
 end
 
 % solve for ramp termination points
-ramp(n+1,1) = (cowl_x/tand(90+defl(n))-cowl_height-tand(defl(n))*ramp(n,1)+ramp(n,2))/...
-    (1/tand(90+defl(n))-tand(defl(n)));
+ramp(n+1,1) = (cowl_x/tand(90+phi(n))-cowl_height-tand(phi(n))*ramp(n,1)+ramp(n,2))/...
+    (1/tand(90+phi(n))-tand(phi(n)));
 
-ramp(n+1,2) = 1/tand(90+defl(n))*(ramp(n+1,1)-cowl_x) + cowl_height;
+ramp(n+1,2) = 1/tand(90+phi(n))*(ramp(n+1,1)-cowl_x) + cowl_height;
 
 centerbody_height = ramp(n+1,2);
 isolator_height = cowl_height - centerbody_height;
-lip_length = isolator_height * tand(defl(n));
+lip_length = isolator_height * tand(phi(n));
 spike_length = cowl_x + lip_length;
 
 

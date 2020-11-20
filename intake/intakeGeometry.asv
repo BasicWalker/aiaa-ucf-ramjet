@@ -11,7 +11,7 @@ clc;clear;close all;
 
 %% define variables
 
-defl = [5 2 3];  % deflection angle array
+defl = [8 2];  % deflection angle array
 n = size(defl,2);  % number of oblique shocks
 gamma = 1.4;  % specific heat ratio for flow
 
@@ -39,7 +39,7 @@ isolator_height = cowl_height - centerbody_height;  % height of straight duct se
 %% oblique shocks
 % solving for weak oblique shocks (imaginary components signify detached shock)
 for i = 1:n+1
-    try
+    Try
         if i < n+1
             [~, theta(i)] = obliqueShock(mach(i), defl(i));
             mach_normal(i) = mach(i)*sind(theta(i));
@@ -60,9 +60,9 @@ for i = 1:n+1
         temperature(i+1) = temperature(i)*t_r;  % multiplies upstream temperature by normal shock ratio to get downstream value
         density(i+1) = density(i)*d_r;  % multiplies upstream density by normal shock ratio to get downstream value
         stagPressure(i+1) = po_r * stagPressure(i);
-    catch warning('detached shock due to imaginary solution');
+    catch warning('detached shock due to imaginary solution')
         break
-    end
+        e
 end
 
 %% geometry propogation

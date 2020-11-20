@@ -7,11 +7,11 @@
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clc;clear;close all;
+clc;clear;
 
 %% define variables
 
-defl = [5 2 3];  % deflection angle array
+defl = [5 10];  % deflection angle array
 n = size(defl,2);  % number of oblique shocks
 gamma = 1.4;  % specific heat ratio for flow
 
@@ -26,15 +26,15 @@ theta = zeros(n,1);  % array for each shock angle formed
 mach_normal = zeros(n,1);  % array for the normal components crossing the oblique wave
 
 %input known terms 
-mach(1) = 1.5;  % freestream mach
+mach(1) = 3;  % freestream mach
 pressure(1) = 26.5e3;  % freestream static pressure (Pa)
 [~, tempRatio, presRatio, ~, ~] = flowisentropic(gamma, mach(1),'mach');
 stagPressure(1) = pressure(1) * presRatio; 
 
 
 cowl_height = 1.25;  % inner radius for cowl <inches>
-centerbody_height = 1;  % inner radius for centerbody <inches>
-isolator_height = cowl_height - centerbody_height;  % height of straight duct section
+% centerbody_height = 1;  % inner radius for centerbody <inches>
+% isolator_height = cowl_height - centerbody_height;  % height of straight duct section
 
 %% oblique shocks
 % solving for weak oblique shocks (imaginary components signify detached shock)
@@ -68,23 +68,29 @@ end
 %% geometry propogation
 % find spike length by intersecting initial shock with cowl height
 cowl_x = cowl_height / tand(theta(1));
-lip_length = isolator_height * tand(defl(n));
-spike_length = cowl_x + lip_length;
-ramp(end,1) = spike_length;  % ramp termination x value
 % 
 % loop to find additional ramp geometry by intersecting n-shock with ramp
 if n >1  % if there are more than one oblique shock solve for the rest
     for i = 2:n
         % solve for ramp x locations
-        ramp(i,1) = tand(theta(i))*cowl_x - cowl_height - tand(defl(i-1))*ramp(i-1,1) + ramp(i-1,2)/...
-            (tand(theta(i))-tand(defl(i-1)));
+        ramp(i,1) = (tand(theta(i))*cowl_x - cowl_height - tand(defl(i-1))*ramp(i-1,1) + ramp(i-1,2))/(tand(theta(i))-tand(defl(i-1)));
         % solve for ramp y locations
+%         ramp(i,2) = tan(theta(i))*(ramp(i,1)-cowl_x)+cowl_height;
         ramp(i,2) = tand(defl(i-1))*(ramp(i,1)-ramp(i-1,1)) + ramp(i-1,2);
     end
 end
 
-% ramp termination y value
-ramp(end,2) = tand(defl(n))*(ramp(n,1) - spike_length) +  (cowl_height-isolator_height);
+% solve for ramp termination points
+ramp(n+1,1) = (cowl_x/tand(90+defl(n))-cowl_height-tand(defl(n))*ramp(n,1)+ramp(n,2))/...
+    (1/tand(90+defl(n))-tand(defl(n)));
+
+ramp(n+1,2) = 1/tand(90+defl(n))*(ramp(n+1,1)-cowl_x) + cowl_height;
+
+centerbody_height = ramp(n+1,2);
+isolator_height = cowl_height - centerbody_height;
+lip_length = isolator_height * tand(defl(n));
+spike_length = cowl_x + lip_length;
+
 
 % 
 %% plotting
@@ -96,7 +102,7 @@ plot([0,spike_length],[0,0],':k', 'LineWidth',2);
 plot([spike_length,spike_length],[0,ramp(end,2)],':k', 'LineWidth',2);
 % 
 % plot shocks
-for i= 1:n
+for i= 1:n+1
     % check if shocks are attached
     if isreal(mach(i+1))
         plot([ramp(i,1),cowl_x],[ramp(i,2),cowl_height], '--c');

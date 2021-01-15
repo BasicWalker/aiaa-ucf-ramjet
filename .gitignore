@@ -1,0 +1,7 @@
+# Documents currently open in windows
+*.autosave
+*.asv
+*~
+
+# Operating System Auto-generated Files
+*.DS_Store

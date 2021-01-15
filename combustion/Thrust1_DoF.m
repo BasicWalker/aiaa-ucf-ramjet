@@ -16,6 +16,7 @@
 % for V_f for each step using kinematics.
 
 %% ---------- define variables ----------
+close all; clear; clc
 if exist('T','var')==0
     load GRAM_Model.mat
 end
@@ -33,7 +34,7 @@ dry_mass = 4.536;  % mass of ramjet without fuelgrain <kg>
 fuel_mass = 1.134;  % mass of fuel grain <kg>
 wet_mass = dry_mass + fuel_mass;  % mass of ramjet without fuelgrain <kg>
 fuel_mass_flow = 0.0033;  % <kg/s>
-c_d = 0.12;  % drag coefficient
+c_d = 0.012;  % drag coefficient
 S = 0.008119;  % frontal surface area <m^2>
 
 
@@ -42,7 +43,7 @@ g = 9.81;  % gravitaional constant <m/s^2>
 initial_temperature = 292.91;  % temperature at initial altitude <K>
 initial_pressure = 89695;  % pressure at initial altitude <pa>
 initial_density = 1.0589;  % density at initial altitude <kg/m^3>
-design_temp = interp1(T.Hgtkm, T.Tmean, (design_altitude)/1e3);
+design_temperature = interp1(T.Hgtkm, T.Tmean, (design_altitude)/1e3);
 design_pressure = interp1(T.Hgtkm, T.PresMean, (design_altitude)/1e3);
 design_density = interp1(T.Hgtkm, T.DensMean, (design_altitude)/1e3);
 gamma = 1.4;  % specific heat ratio
@@ -57,6 +58,9 @@ step_size = 0.1;
 t = 0:step_size:burntime;  % time iteration array
 
 % find initial acceleration required
+
+initial_acceleration = (design_mach*sqrt(gamma*R*design_temperature) - ...
+    initial_mach*sqrt(gamma*R*initial_temperature))/burntime;
 
 % pre-allocate array variables
 thrust = zeros(1, size(t,2));
@@ -101,7 +105,45 @@ for i = 2:size(t,2)
 end
 
 %% Plotting
-figure
+figure('Name','Thrust & Drag Vs. Time');
+plot(t,thrust); hold on;
+plot(t,drag);
+ylabel('<N>');
+xlabel('<s>');
+legend('Thrust','Drag');
+hold off;
+
+figure('Name','Velocity & Mach Number Vs. Time')
+ax1 = subplot(2,1,1);
+plot(ax1,t,velocity);
+title(ax1,'Velocity');
+ylabel(ax1,'<m/s>');
+xlabel(ax1,'<s>');
+ax1 = subplot(2,1,2);
+plot(ax1,t,mach);
+title(ax1,'Mach Number');
+ylabel(ax1,'<unitless>');
+
+figure('Name','Environment Vs. Time');
+ax1 = subplot(4,1,1);
+plot(ax1,t,altitude);
+title(ax1,'Altitude');
+ylabel(ax1,'<m>');
+xlabel(ax1,'<s>');
+ax2 = subplot(4,1,2);
+plot(ax2,t,temperature);
+title(ax2,'Temperature');
+ylabel(ax2,'<K>');
+ax3 = subplot(4,1,3);
+plot(ax3,t,pressure);
+title(ax3,'Pressure');
+ylabel(ax3,'<Pa>');
+ax4 = subplot(4,1,4);
+plot(ax4,t,density);
+title(ax4,'Density');
+ylabel(ax4,'<kg/m^3>');
+
+
 
 % %% functions
 % function 

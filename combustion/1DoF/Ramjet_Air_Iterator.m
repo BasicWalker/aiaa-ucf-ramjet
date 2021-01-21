@@ -97,7 +97,7 @@ while height(i) > 0
     air_freeStream_flowRate(i) = air_dens(i) * vel(i) * veh_A_frontal;
     
     
-    %Mass Caluclations
+    %Mass Calculations
     veh_mass(i) = veh_mass_wet-veh_fuel_mass/veh_burn_time * time_flight;
     
     

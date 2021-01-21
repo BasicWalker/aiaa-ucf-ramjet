@@ -82,7 +82,7 @@ pressure(1) = initial_pressure;
 temperature(1) = initial_temperature;
 mass(1) = wet_mass;
 weight(1) = g*mass(1);
-drag(1) = c_d*0.5*design_density*velocity(1)^2;
+drag(1) = c_d*S*0.5*design_density*velocity(1)^2;
 thrust(1) = mass(1)*initial_acceleration + drag(1) + weight(1);
 
 for i = 2:size(t,2)
@@ -100,7 +100,7 @@ for i = 2:size(t,2)
         break
     end
     weight(i) = mass(i)*g;
-    drag(i) = c_d*0.5*density(i)*velocity(i)^2;
+    drag(i) = c_d*S*0.5*density(i)*velocity(i)^2;
     thrust(i) = mass(i)*initial_acceleration + drag(i) + weight(i);
 end
 

@@ -18,7 +18,7 @@ end
 initial_mach = 1.2;  % booster max mach
 initial_altitude = 1100;  %  initial altitude for ramjet start <m>
 design_mach = 2;  % mach number for criticl flight operations
-burntime = 2;  % burntime to reach design mach <sec>
+burntime = 3;  % burntime to reach design mach <sec>
 
 % vehicle properties
 dry_mass = 4.536;  % mass of ramjet without fuelgrain <kg>
@@ -34,7 +34,7 @@ gamma = 1.4;  % specific heat ratio
 R = 287;  % <J/kg*K>
 
 % simulation properties
-step_size = 0.1;
+step_size = 0.01;
 
 %% ---------- simulation ----------
 

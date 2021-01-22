@@ -42,7 +42,7 @@ veh_mass_wet = 5;
 %Fuel Mass;             (kg), mass of the fuel onboard the vehicle that is burned
 veh_fuel_mass = 0.5;
 %Burn Time;             (s), total time for which the fuel is burning
-veh_burn_time = 14;
+veh_burn_time = 5;
 %Fuel Flow Rate;        (kg/s), flow rate of the fuel out of the vehicle
 veh_fuel_rate = veh_fuel_mass / veh_burn_time;
 
@@ -56,7 +56,7 @@ veh_tumblingDragFactor = 16.3;
 
 %PROPULSION SYSTEM PROPERTIES
 %Thrust;                (N), Thrust of the Ramjet Vehicle
-veh_thrust = 200;
+veh_thrust = 427.89;
 %Mass Flow Rate         (kg/s), Mass Flow Rate of Propellants through Nozzle
 prop_massFlow_design = 1;
 %Exit Velocity;         (m/s), Velocity of Combustion Products at Nozzle Exit
@@ -89,9 +89,9 @@ max_vel = 0;
 while height(i) > 0
     
     %Air Properties Interpolation
-    air_dens(i) = airProp(floor(height(i)), 5);  %interp1(airProp(:, 1), airProp(:, 5), height(i));
-    air_pres(i) = airProp(floor(height(i)), 6);  %interp1(airProp(:, 1), airProp(:, 6), height(i));
-    air_temp(i) = airProp(floor(height(i)), 7);  %interp1(airProp(:, 1), airProp(:, 7), height(i));
+    air_dens(i) = interp1(airProp(:, 1), airProp(:, 5), height(i));%airProp(floor(height(i)), 5);  %interp1(airProp(:, 1), airProp(:, 5), height(i));
+    air_pres(i) = interp1(airProp(:, 1), airProp(:, 6), height(i));%airProp(floor(height(i)), 6);  %interp1(airProp(:, 1), airProp(:, 6), height(i));
+    air_temp(i) = interp1(airProp(:, 1), airProp(:, 7), height(i));%airProp(floor(height(i)), 7);  %interp1(airProp(:, 1), airProp(:, 7), height(i));
     
     %Free-Stream Air Mass Flow Rate
     air_freeStream_flowRate(i) = air_dens(i) * vel(i) * veh_A_frontal;

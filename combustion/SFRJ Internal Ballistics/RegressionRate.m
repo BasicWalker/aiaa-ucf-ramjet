@@ -10,5 +10,5 @@
 % ---------------------------------------------------------------------- %
 
 % Simplified linear regression rate assumption
-BurnRt      = 0.001;        % Burn Rate (m/s)
+BurnRt     = 0.001;         % Burn Rate (m/s)
 RgrsPerStp = BurnRt*SFRJDt; % Regression Per Step (m)

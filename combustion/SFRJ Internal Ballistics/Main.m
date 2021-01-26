@@ -38,6 +38,8 @@ while StopBurn == 0
         fprintf('WARNING: O/F Ratio too low \n')
     end
      
+    fprintf('Running... \n')                    % Running Simulator indicator
+    
     Thrust                                      % Call Thrust Model
     Trajectory                                  % Call Trajectory Model
     

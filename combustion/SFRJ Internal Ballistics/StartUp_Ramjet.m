@@ -5,7 +5,7 @@
 % First order approximation of the performance 
 % capabilities of a solid fuel ramjet
 % 
-% File Name: StartUp.m 
+% File Name: StartUp_Ramjet.m 
 % 
 % File Description: 
 % Main executable file for the SFRJ Internal Ballistic Simulator. Defines

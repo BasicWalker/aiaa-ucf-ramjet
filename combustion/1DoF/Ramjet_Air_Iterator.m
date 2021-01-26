@@ -42,7 +42,7 @@ veh_mass_wet = 5;
 %Fuel Mass;             (kg), mass of the fuel onboard the vehicle that is burned
 veh_fuel_mass = 0.5;
 %Burn Time;             (s), total time for which the fuel is burning
-veh_burn_time = 5;
+veh_burn_time = 10;
 %Fuel Flow Rate;        (kg/s), flow rate of the fuel out of the vehicle
 veh_fuel_rate = veh_fuel_mass / veh_burn_time;
 

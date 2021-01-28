@@ -19,17 +19,20 @@ close all; clear; clc
 %% User Defined Inputs
 gamma       = 1.4;                % Cp/Cv
 exitMach    = 2.4;                % Mach Number Leaving the Nozzle
-n           = 7;                  % Number of Characteristic Lines
+n           = 5;                  % Number of Characteristic Lines
 nodes       = nodeCalculator(n);   % Calculates Number of Nodes
 
 % Calculate Total Number of Nodes Created by the Number of Characteristics
 
 
 %% Initialize Variables
-theta   = zeros(1, nodes);
-PM      = zeros (1, nodes);
-KL      = zeros(1, nodes);
-KR      = zeros(1, nodes);
+theta       = zeros(nodes, 1);
+PM          = zeros(nodes, 1);
+KL          = zeros(nodes, 1);
+KR          = zeros(nodes, 1);
+
+mach        = zeros(nodes, 1);
+machAngle   = zeros(nodes, 1);
 
 %% Calculate Angles at the Throat 
 exitPM          = PrandtlMeyer(gamma, exitMach);
@@ -52,11 +55,61 @@ PM(i+1)     = PM(i);
 KL(i+1)     = KL(i);
 KR(i+1)     = KR(i);
 
+% Initialize at 1st right running characteristic
+p = 2; 
+q = n + 2;
+for iter = 1:n-1 
+    j = p; %2 %3 %4 %5
+    h = q; %7 %12 %16 %19
     
+    % Set values along centerline
+    theta(h)    = 0;
+    KR(h)       = KR(j);
+    PM(h)       = KR(h) - theta(h);
+    KL(h)       = theta(h) - PM(h);
+    j           = j + 1; %3 %4 %5
 
-
-
+        % Loop through left running characteristic except for wall
+        for i = h+1:n-p+q   % from 8 to 10 % from 13 to 14 % from 17 to 17
+            KR(i)    = KR(j); 
+            KL(i)    = KL(i-1);
+            theta(i) = 0.5 * (KR(i) + KL(i));
+            PM(i)    = 0.5 * (KR(i) - KL(i));
+            j = j + 1;
+        end
     
+    % Increment to wall. Last iteration will not go through above loop
+    if i == n-p+q
+        h = i + 1; %11 %15 %18
+    else
+        h = h + 1; %20
+    end
+    
+    % Set values along the nozzle wall
+    theta(h)    = theta(h-1);
+    PM(h)       = PM(h-1);
+    KL(h)       = KL(h-1);
+    KR(h)       = KR(h-1);
+    
+    % Set up for next right running characteristic line
+    p = p + 1;
+    q = h + 1; 
+end
+
+% Determine Mach Number and Mach Angle at Each Node
+for i = 1:nodes
+    [mach(i), machAngle(i)] = inversePrandtlMeyer(gamma, PM(i));
+end
+
+% At this point, all of the value should be set, including along the nozzle
+% wall. Tabulate results
+T = table(theta, PM, KL, KR, mach, machAngle);
+
+%% Plot Nozzle Wall
+
+
+
+
 
 
 

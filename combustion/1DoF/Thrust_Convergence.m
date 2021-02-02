@@ -18,14 +18,14 @@ end
 initial_mach = 1.2;  % booster max mach
 initial_altitude = 1100;  %  initial altitude for ramjet start <m>
 design_mach = 2;  % mach number for criticl flight operations
-burntime = 3;  % burntime to reach design mach <sec>
+burntime = 5;  % burntime to reach design mach <sec>
 
 % vehicle properties
 dry_mass = 4.536;  % mass of ramjet without fuelgrain <kg>
 fuel_mass = 1.134;  % mass of fuel grain <kg>
 wet_mass = dry_mass + fuel_mass;  % mass of ramjet without fuelgrain <kg>
 fuel_mass_flow = 0.0033;  % <kg/s>
-c_d = 0.012;  % drag coefficient
+c_d = 0.35;  % drag coefficient
 S = 0.008119;  % frontal surface area <m^2>
 
 % environment properties
@@ -67,7 +67,7 @@ while true
     drag(j,1) = c_d*0.5*density(j,1)*velocity(j,1)^2*S;
     mass(j,1) = wet_mass;
     weight(j,1) = g*mass(j,1);
-    acceleration(j,1) = (thrust(j,1) + drag(j,1) + weight(j,1))/ mass(j,1);
+    acceleration(j,1) = (thrust(j,1) - drag(j,1) - weight(j,1))/ mass(j,1);
 
     for i = 2:size(t,2)
         velocity(j,i) = velocity(j,i-1) + acceleration(j,i-1)*(step_size);
@@ -85,7 +85,7 @@ while true
             break
         end
         weight(j,i) = g*mass(j,i);
-        acceleration(j,i) = (thrust(j,i) + drag(j,i) + weight(j,i))/ mass(j,i);
+        acceleration(j,i) = (thrust(j,i) - drag(j,i) - weight(j,i))/ mass(j,i);
     end
     final_mach(j) = mach(end);
     resid(j) = abs(design_mach-final_mach(j));
@@ -93,8 +93,8 @@ while true
         break
     end
     if j == 1
-        chng(j) = 1;
-        thrust(j+1,:) = 201;
+        chng(j) = 0;
+        thrust(j+1,:) = thrust(j,:) + 1;
     else
         chng(j) = (resid(j-1) - resid(j))/(thrust(j-1,1)-thrust(j,1));
         thrust(j+1,:) = thrust(j,:) - resid(j)/chng(j);

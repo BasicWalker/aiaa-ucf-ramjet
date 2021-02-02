@@ -36,27 +36,27 @@ air_r = 287.1;
 
 %MASS PROPERTIES
 %Vehicle Mass;          (kg), initial mass of the ramjet vehicle
-veh_mass_wet = 5;
+veh_mass_wet = 4.536;
 
 %FUEL PROPERTIES
 %Fuel Mass;             (kg), mass of the fuel onboard the vehicle that is burned
-veh_fuel_mass = 0.5;
+veh_fuel_mass = 1.134; %0.5;
 %Burn Time;             (s), total time for which the fuel is burning
-veh_burn_time = 10;
+veh_burn_time = 15;
 %Fuel Flow Rate;        (kg/s), flow rate of the fuel out of the vehicle
-veh_fuel_rate = veh_fuel_mass / veh_burn_time;
+veh_fuel_rate = 0.0033; % veh_fuel_mass / veh_burn_time;
 
 %DIMENSIONAL PROPERTIES
 %Vehicle Diameter;      (in), max diameter of the ramjet vehicle in inches
 veh_dia_in = 3;
 veh_dia = veh_dia_in * 2.54/100;    %convert Vehicle Diameter to meters
-veh_A_frontal = pi * veh_dia^2 / 4;
-veh_C_d = 0.12;
+veh_A_frontal = 0.008119; % pi * veh_dia^2 / 4;
+veh_C_d = 0.35;
 veh_tumblingDragFactor = 16.3;
 
 %PROPULSION SYSTEM PROPERTIES
 %Thrust;                (N), Thrust of the Ramjet Vehicle
-veh_thrust = 427.89;
+veh_thrust = 758.74;
 %Mass Flow Rate         (kg/s), Mass Flow Rate of Propellants through Nozzle
 prop_massFlow_design = 1;
 %Exit Velocity;         (m/s), Velocity of Combustion Products at Nozzle Exit

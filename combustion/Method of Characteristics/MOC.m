@@ -20,10 +20,14 @@ close all; clear; clc
 gamma       = 1.4;                % Cp/Cv
 exitMach    = 2.4;                % Mach Number Leaving the Nozzle
 n           = 5;                  % Number of Characteristic Lines
-nodes       = nodeCalculator(n);   % Calculates Number of Nodes
+nodes       = nodeCalculator(n);  % Calculates Number of Nodes
 
-% Calculate Total Number of Nodes Created by the Number of Characteristics
-
+% Known Nozzle Geometry Parameters
+exitRadius      = 1.5;                                % Radius of nozzle exit <in>
+exitArea        = pi * exitRadius^2;                % Area of nozzle exit <in2>
+areaRatio       = isentropicFlow(gamma, exitMach);  % Area ratio given exit mach
+throatArea      = exitArea / areaRatio;             % Area of nozzle throat <in2>
+throatRadius    = sqrt(throatArea / pi);            % Radius of nozzle throat <in>
 
 %% Initialize Variables
 theta       = zeros(nodes, 1);
@@ -106,6 +110,29 @@ end
 T = table(theta, PM, KL, KR, mach, machAngle);
 
 %% Plot Nozzle Wall
+x = [nodes, 1];
+y = [nodes, 1];
+centerline_x = [n, 1];
+centerline_y = [n, 1];
+
+xlim = 4;
+ylim = exitRadius; 
+line
+
+% Plots Centerline
+plot([0 xlim], [0 0], '--k', 'LineWidth', 2)
+hold on
+
+%
+for i = 1:n
+    centerline_x(i) = throatRadius * tand(90 - PM(i) - theta(i));
+    centerline_y(i) = 0;
+    plot( [0 centerline_x(i)] , [throatRadius centerline_y(i)] )
+    hold on
+end
+
+    
+    
 
 
 

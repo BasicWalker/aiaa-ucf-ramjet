@@ -23,7 +23,7 @@ n           = 5;                  % Number of Characteristic Lines
 nodes       = nodeCalculator(n);  % Calculates Number of Nodes
 
 % Known Nozzle Geometry Parameters
-exitRadius      = 1.5;                                % Radius of nozzle exit <in>
+exitRadius      = 1.5;                               % Radius of nozzle exit <in>
 exitArea        = pi * exitRadius^2;                % Area of nozzle exit <in2>
 areaRatio       = isentropicFlow(gamma, exitMach);  % Area ratio given exit mach
 throatArea      = exitArea / areaRatio;             % Area of nozzle throat <in2>

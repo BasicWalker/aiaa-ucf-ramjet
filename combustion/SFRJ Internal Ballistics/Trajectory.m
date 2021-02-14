@@ -13,4 +13,4 @@
 Height(n) = Height(1);
 
 % Interpolate to get back pressure
-BackPres(n) = interp1(AltitudeTbl(:,2),AltitudeTbl(:,5),Height(n),'spline');
+BackPres(n) = interp1(AltitudeTbl(:,2),AltitudeTbl(:,7),Height(n),'spline'); 

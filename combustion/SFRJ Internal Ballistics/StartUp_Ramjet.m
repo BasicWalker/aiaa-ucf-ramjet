@@ -33,6 +33,7 @@ StopBurn        = false;                    % Burn status flag (boolean)
 gravity         = 9.81;                     % gravitation acceleration constant (m/s^2)
 In2Mtr          = 39.3701;                  % Inch to meter converstion 
 Bar2kPa         = 100.0;                    % Psi to Pa conversion
+Pa2kPa          = 1000.0;                   % Pa to Kpa
 C2K             = 273.15;                   % Celcius to Kelvin conversion
 R               = 287;                      % Universal Gas Constant for air
 AltitudeTbl     = table2array(AltitudeData);% Altitude Table
@@ -53,7 +54,7 @@ FuelRho         = 1020;                     % Grain Density (kg/m^3)
 
 InltD           = 0.75 / In2Mtr;            % Diameter of inlet (m)
 InltArea        = pi*InltD^2*(1/4);         % Area of inlet (m)
-InltPres(1)     = 6.1493 * Bar2kPa;         % Pressure of inlet (kPa)
+InltPres(1)     = 6.1493 * Bar2kPa;         % Pressure (static) of inlet (kPa)
 InltRho         = 4.5122;                   % Density of air at the inlet (kg/m^3)
 InltTemp        = 250.05 + C2K;             % Temp of air at the inlet (K)
 gamma           = 1.3845;                   % Specific heat ratio of air 
@@ -65,10 +66,10 @@ InltMassFlw     = InltRho*InltVel*InltArea; % Mass flow rate of air at the inlet
 % ----------------------------- Nozzle ----------------------------- %
 
 NzlThrtDia      = 0.985 /In2Mtr;            % Throat Diameter, assuming exit area is 1.6 in diameter
-NzlAT           = pi*(NzlThrtDia/2)^2;      % Throat area
+NzlAT           = pi*(NzlThrtDia/2)^2;      % Throat area (m^2)
 
 % --------------- Chemistry User Defined Parameters ---------------- %
-
+Phi             = 1.0;                      % Equivalence ratio
 
 
 

@@ -7,7 +7,7 @@
 % Name            Date      SCR  Description
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial Creation 
-% Ethan Sherlock  02/14/21  001  Updated plots for chamber pressure update
+% Ethan Sherlock  02/14/21  001  Updated plots for SCR 001
 % ---------------------------------------------------------------------- %
 Thrustdlvd(n-1) = 0.0;
 PC(n-1)         = 0.0;

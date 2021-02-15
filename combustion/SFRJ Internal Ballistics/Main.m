@@ -6,20 +6,18 @@
 % 
 % Name            Date      SCR  Description
 % --------------  --------  ---  ------------------------------
-% Ethan Sherlock  01/22/21  000  Initial Creation 
-% Ethan Sherlock  02/14/21  001  Chamber Pressure Calculation Update
+% Ethan Sherlock  01/22/21  000  Initial creation 
+% Ethan Sherlock  02/14/21  001  Chamber pressure calculation update
+% Ethan Sherlock  02/14/21  005  1DOF trajectory update
 % ---------------------------------------------------------------------- %
 
 while StopBurn == 0
     BurnTime(n) = time;                         % Simulation Time
-    Trajectory                                  % Call Trajectory Model
+    
     RegressionRate                              % Call Regression Rate Model
     GrainGeometry                               % Call Instantaneous Grain Geometry Model
     
-    % Calculate Fuel Mass Properties
-    MFuelGen(n) = RgrsPerStp*FuelRho*FuelSA(n); % Fuel mass generated
-    MdotFuel(n) = MFuelGen(n)/SFRJDt;           % Fuel mass flow rate
-    FuelMass(n) = FuelRho*FuelVol(n);           % Fuel mass 
+    
     
     [AFRst, gamma_nzl, T_AFT] = Chemistry(Phi); % Call Chemistry Model
     T_stag(n) = T_AFT;                          % Stagnation temp in nozzle
@@ -49,6 +47,8 @@ while StopBurn == 0
     fprintf('Running... \n')                    % Running Simulator indicator
     
     Thrust                                      % Call Thrust Model
+    
+    Trajectory                                  % Call Trajectory Model
    
     % Step through simulation time
     time = time + SFRJDt;

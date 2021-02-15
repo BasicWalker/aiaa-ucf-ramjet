@@ -26,6 +26,11 @@ end
 
 StepHeight(n) = (GrainID(n) - InltD)/2;             % Rearward Step Height
 
+% Fuel Mass Properties
+MFuelGen(n) = RgrsPerStp*FuelRho*FuelSA(n);         % Fuel mass generated every time step
+MdotFuel(n) = MFuelGen(n)/SFRJDt;                   % Fuel mass flow rate
+FuelMass(n) = FuelRho*FuelVol(n);                   % Fuel mass 
+
 if GrainID(n) > GrainOD
     StopBurn = true;
 end

@@ -8,27 +8,17 @@
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  001  Updated plots for SCR 001
+% Ethan Sherlock  02/14/21  005  1DOF trajectory update
 % ---------------------------------------------------------------------- %
-Thrustdlvd(n-1) = 0.0;
-PC(n-1)         = 0.0;
-OFRatio(n-1)    = 0.0;
-InltPres(n-1)   = 0.0;
-PCreq(n-1)      = 0.0;
-PC_TAFT(n-1)    = 0.0;
-
-
-% figure
-% hold on
-% plot(BurnTime,InltPres)
-% plot(BurnTime,PC)
-% plot(BurnTime,PCres)
-% plot(BurnTime,BackPres)
-% title('Pressure Plots')
-% xlabel('Time (s)')
-% ylabel('Pressure (kPa)')
-% grid on
-% legend('Inlet Pressure','Chamber Pressure','Required Pressure','Back Pressure')
-% ylim([0 900])
+Thrustdlvd(n-1)     = 0.0;
+PC(n-1)             = 0.0;
+OFRatio(n-1)        = 0.0;
+InltPres(n-1)       = 0.0;
+PCreq(n-1)          = 0.0;
+PC_TAFT(n-1)        = 0.0;
+drag(n-1)           = 0.0;
+velocity(n-1)       = 0.0;
+acceleration(n-1)   = 0.0;
 
 figure('Name','O/F Ratio')
 plot(BurnTime,OFRatio)
@@ -47,21 +37,13 @@ grid on
 % legend('A/F Results','A/F Target')
 % grid on
 
-figure('Name','Thrust Curve')
-plot(BurnTime,Thrustdlvd)
-title('Thrust Curve')
+figure('Name','Force Profile')
+plot(BurnTime,Thrustdlvd,BurnTime,drag)
+title('Thrust & Drag vs Time')
 xlabel('Time (s)')
-ylabel('Thrust (N)')
+ylabel('Force (N)')
+legend('Thrust Curve','Drag')
 grid on
-% ylim([0 4000])
-
-% figure('Name','Instantaneous Mass Properties')
-% plot(BurnTime,MassGen, BurnTime, MairGen, BurnTime, MFuelGen)
-% title('Instantaneous Mass Properties')
-% xlabel('Time (s)')
-% ylabel('Mass (kg)')
-% legend('Total Mass','Air Mass','Fuel Mass')
-% grid on
 
 figure('Name','Mass Flow Rate')
 plot(BurnTime,MassFlow, BurnTime, MdotAir, BurnTime, MdotFuel)
@@ -80,7 +62,7 @@ grid on
 % ylim([0 .05])
 
 % figure('Name','Pressure Plots')
-% plot(BurnTime, InltPres, BurnTime, PC, BurnTime, PCreq, BurnTime, BackPres, BurnTime, PC_TAFT)
+% plot(BurnTime, InltPres, BurnTime, PC, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
 % title('Pressure Plots')
 % xlabel('Time (s)')
 % ylabel('Pressure (kPa)')
@@ -88,13 +70,32 @@ grid on
 % grid on
 
 figure('Name','Pressure Plots')
-plot(BurnTime, InltPres, BurnTime, PCreq, BurnTime, BackPres, BurnTime, PC_TAFT)
+plot(BurnTime, InltPres, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
 title('Pressure Plots')
 xlabel('Time (s)')
 ylabel('Pressure (kPa)')
 legend('Inlet Pressure','Required Pressure - Choked Flow','Back Pressure', 'Chamber Pressure - Adiabatic Flame Temp')
 grid on
 
+figure('Name','Velocity & Acceleration Profiles')
+yyaxis left
+plot(BurnTime, velocity)
+title('Velocity and Acceleration Profiles')
+xlabel('Time (s)')
+ylabel('Velocity (m/s)')
+yyaxis right
+plot(BurnTime, acceleration)
+ylabel('Acceleration (m/s^2)')
+legend('Velocity','Acceleration')
+grid on
+
+figure('Name','Trajectory Profile')
+plot(BurnTime,altitude)
+title('Altitude vs Time')
+xlabel('Time (s)')
+ylabel('Altitude (m)')
+grid on
+ylim([0 max(altitude)+500])
 
 fprintf('\n------------ Simulation Results ------------\n')
 fprintf('Burn Time:             %.2f   (s)\n', BurnTime(n-1))

@@ -23,8 +23,14 @@ PC(n) = (3/(121*(NzlAT^2))) * ((20*sqrt(5))*sqrt(121*(NzlAT^2)*(InltArea^2)*Inlt
       + 11*NzlAT*f(n) - 3000*(InltArea^2)*InltRho(1));
    
 % Required chamber pressure for exit Mach = 2 
+if (n > 1)
+    altitude(n) = altitude(n-1) + velocity(n-1)*SFRJDt + 0.5*acceleration(n-1)*SFRJDt^2;
+end
+pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(n))/1e3);
+pressure_atm(n) = pressure_atm(n)*(1/Pa2kPa);
+
 [mach, T, P, rho, area] = flowisentropic(gamma_nzlT(n), 2 ,'mach'); % Solves for conditions when exit Mach = 2
-PCreq(n) = (1/P)*BackPres(n);                                       % Calculates Stag Pres based on Pressure ratio, assumes Pstag = PC
+PCreq(n) = (1/P)*pressure_atm(n);                                   % Calculates Stag Pres based on Pressure ratio, assumes Pstag = PC
 
 % Calculate air velocity after sudden expansion inside the chamber 
 AirVel(n) = InltVel(n) * (InltArea/PortArea(n));                    % Velocity of air 

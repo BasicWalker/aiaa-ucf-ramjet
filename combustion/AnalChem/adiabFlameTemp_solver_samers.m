@@ -1,4 +1,4 @@
-clc; clear;
+ clc; clear;
 % define constants
 T_STP = 298;  % standard temp <K>
 T_air = 475;  % <K>
@@ -26,6 +26,20 @@ mol_p = [0 0 3.85 2.425 19.26];  % molar values of products
 
 T_aft = (sum(mol_r.*hfMat) - sum(mol_p.*hfMat) + sum(mol_r.*CpMat.*(T_r-T_STP)) +...
     sum(mol_p.*CpMat.*T_STP)) / sum(mol_p.*CpMat);
+fprintf("Equivalence Ratio = 1\n");
+fprintf("T_AFT = %.4f K\n\n",T_aft);
 
+%Changing Equivalence Ratios
+
+%Equivalence Ratio: 0.5
+%Can't assume 1 mole of fuel for non-stoichiometric combustion
+
+mol_r = [48.214 1 0 0 0];
+mol_p = [0 0 3.85 2.425 5.062];
+
+T_aft = (sum(mol_r.*hfMat) - sum(mol_p.*hfMat) + sum(mol_r.*CpMat.*(T_r-T_STP)) +...
+    sum(mol_p.*CpMat.*T_STP)) / sum(mol_p.*CpMat);
+fprintf("--------EQUIVALENCE RATIO = 0.5--------\n");
 fprintf("T_AFT = %.4f K",T_aft);
+
 

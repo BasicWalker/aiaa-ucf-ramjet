@@ -59,7 +59,7 @@ FuelRho         = 1020;                     % Grain Density (kg/m^3)
 
 % ----------------- Intake User Defined Parameters ----------------- %
 
-InltD           = 0.75 / In2Mtr;            % Diameter of inlet (m)
+InltD           = 0.85 / In2Mtr;            % Diameter of inlet (m)
 InltArea        = pi*InltD^2*(1/4);         % Area of inlet (m)
 InltPres(1)     = 6.1493 * Bar2kPa;         % Pressure (static) of inlet (kPa)
 InltRho         = 4.5122;                   % Density of air at the inlet (kg/m^3)

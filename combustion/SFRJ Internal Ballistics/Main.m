@@ -19,9 +19,7 @@ while StopBurn == 0
     
     
     
-    [AFRst, gamma_nzl, T_AFT] = Chemistry(Phi); % Call Chemistry Model
-    T_stag(n) = T_AFT;                          % Stagnation temp in nozzle
-    gamma_nzlT(n) = gamma_nzl;                  % Gamma at the nozzle throat
+
     Gas                                         % Call Gas Model
 
     BoundaryLayer                               % Call Boundary Layer Model
@@ -30,9 +28,7 @@ while StopBurn == 0
     % Fuel Mass Prop continued & O/F Ratio calculation
     OFRatio(n) = MOxdzrGen(n)/MFuelGen(n);      % O/F Ratio
     MassGen(n) = MairGen(n) + MFuelGen(n);      % Total mass generated (kg)
-    
     MassFlow(n) = MassGen(n)/SFRJDt;            % Total mass flow (kg/s)
-    
     AFRatio(n) = MairGen(n)/MFuelGen(n);        % Fuel to air ratio 
     
     % Print O/F Ratio warning

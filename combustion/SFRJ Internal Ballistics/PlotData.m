@@ -97,10 +97,20 @@ ylabel('Altitude (m)')
 grid on
 ylim([0 max(altitude)+500])
 
+figure('Name','Flight Mach')
+plot(BurnTime,flight_mach)
+title('Vehicle Mach vs Time')
+xlabel('Time (s)')
+ylabel('Mach No.')
+grid on
+
 fprintf('\n------------ Simulation Results ------------\n')
 fprintf('Burn Time:             %.2f   (s)\n', BurnTime(n-1))
 fprintf('Average Thrust:        %.2f  (N)\n', mean(Thrustdlvd))
-fprintf('Total Impulse:         %.2f  (Ns)\n', TotallImp(n-1))
+fprintf('Total Impulse:         %.2f (Ns)\n', TotallImp(n-1))
 fprintf('Inlet Velocity:        %.2f   (m/s)\n', InltVel(n-1))
-fprintf('Inlet Mass Flow Rate:  %.4f  (kg/s)\n', InltMassFlw)
-fprintf('PC From TAFT:          %.1f  (kPa)\n',mean(PC_TAFT))
+fprintf('Inlet Mass Flow Rate:  %.3f   (kg/s)\n', InltMassFlw)
+fprintf('PC From TAFT:          %.2f  (kPa)\n',mean(PC_TAFT))
+fprintf('Initial Step Height:   %.2f    (in) \n', StepHeight(1)*In2Mtr)
+fprintf('Average O/F Ratio:     %.2f      \n',mean(OFRatio))
+fprintf('--------------------------------------------\n')

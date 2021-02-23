@@ -22,6 +22,9 @@ if(CStar(n) < 0)
     CStar(n) = 0.0;
 end 
 
+
+
+
 % Thrust Calculations 
 Thrustdlvd(n) = MassGen(n)*CStar(n)/SFRJDt; % Thrust delivered, assuming thrust coefficient = 1.0
 Impulse(n) = Thrustdlvd(n)*SFRJDt;          % Impulse delivered

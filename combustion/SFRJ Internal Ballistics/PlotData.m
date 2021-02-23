@@ -104,6 +104,14 @@ xlabel('Time (s)')
 ylabel('Mach No.')
 grid on
 
+figure('Name','Equivalence Ratio')
+plot(BurnTime,phi_eqv)
+title('Equivalence Ratio vs Time')
+xlabel('Time (s)')
+ylabel('Equivalence Ratio (phi)')
+grid on
+ylim([0 8])
+
 fprintf('\n------------ Simulation Results ------------\n')
 fprintf('Burn Time:             %.2f   (s)\n', BurnTime(n-1))
 fprintf('Average Thrust:        %.2f  (N)\n', mean(Thrustdlvd))

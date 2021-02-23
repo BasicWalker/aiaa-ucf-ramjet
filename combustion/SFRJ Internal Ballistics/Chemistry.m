@@ -1,4 +1,4 @@
-% --------- AIAA Internal Ballistic Simulator code for UCF HPR --------- %
+% --------- AIAA Internal Ballistic Simulator code for UCF HPR ---------- %
 % File Name: Chemistry.m 
 % 
 % File Description: 
@@ -9,34 +9,75 @@
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  002  Chemical balance, T_AFT, gamma calculations
-% ---------------------------------------------------------------------- %
+% ----------------------------------------------------------------------- %
 
-% ---------------------------------------------------------------------- %
-% ABS Chemical Formula: C8H8 C4H6 C3H3N 
+% ----------------------------------------------------------------------- %
+% ABS Chemical Formula: C3.85 H4.85 N0.43 
 % Air Chemical Formula: 0.79N2 0.21O2
 % Reaction:             H2O CO2 N2
-% ---------------------------------------------------------------------- %
-function [gamma_nzl, T_AFT] = Chemistry(f)
+% ----------------------------------------------------------------------- %
+function [phi, gamma_nzl, T_AFT] = Chemistry(f)
+% ----------------- Initialize Values ----------------- % 
+f_yield = f;                                                        % Actual fuel to air ratio     
+MW_ABS  = 12.011*3.85 + 1.008*4.85 + 14.007*0.43;                   % Molecular Weight of ABS
+MW_Air  = 28.9647;                                                  % Molecular Weight of Air
+MW_N2   = 14.007*2;                                                 % Molecular Weight of N2
+MW_O2   = 15.999*2;                                                 % Molecular Weight of O2
+MW_CO2  = 12.011 + 2*15.999;                                        % Molecular Weight of CO2
 
-f_yield = f;            
+% ---------------------- Stoichiometric Combustion ---------------------- % 
+% C3.85 H4.85 N0.43 + (A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2
+% 3.85 = D
+% 4.85 = 2B
+% 0.43 + A*2*0.71 = 2E
+% A*0.21*2 = B + 2D
+% ----------------------------------------------------------------------- % 
+D = 3.85;                                                           % Systems of equations
+B = 4.85/2;                                                         % Systems of equations
+A = (B + 2*D)/(0.21*2);                                             % Systems of equations
+E = (0.43 + A*2*0.71)/2;                                            % Systems of equations
+mol_st = [A B D E];                                                 % Molar Matrix     
+mf_st = MW_ABS;                                                     % Mass of ABS (kg)
+ma_st = mol_st(1)*MW_Air;                                           % Mass of Air (kg)
+f_st = mf_st/ma_st;                                                 % Stoichiometric fuel to air ratio
+%fprintf('\nCHN + %.2f(0.71N2 + 0.21O2) -> %.2fH2O + %.2fCO2 + %.2fN2\n', mol_st(1),mol_st(2),mol_st(3),mol_st(4));
 
-% Stoich combustion chemical balance equation
-f_st = 0.079;
+phi = f_yield/f_st;
 
-% Equivalence ratio
-phi = f_yield/f_st;                 % Equivalence Ratio
-
-    if(phi == 1)                      % Equivalence Ratio = 1    
+if(phi == 1)                            %  Fuel lean Combustion 
         
-        T_AFT = 3189.37;            % Adiabatic Flame Temperature (K)
-        gamma_nzl = 1.3845;         % gamma at nozzle throat
+        T_AFT = 3189.37;                % Adiabatic Flame Temperature (K)
+        gamma_nzl = 1.3845;             % gamma at nozzle throat
         
-    elseif(phi < 1)                   % Equivalence Ratio < 1, fuel lean
+    elseif(phi < 1)                    
+% ------------------------ Fuel lean Combustion ------------------------- % 
+% C3.85 H4.85 N0.43 + (1/phi)(A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2 + (F)O2
+% C: 3.85 = D
+% H: 4.85 = 2B
+% N: 0.43 + A*2*0.71 = 2E
+% O: A*0.21*2 = B + 2D
+% ----------------------------------------------------------------------- % 
         
         T_AFT = 3189.37;            % Adiabatic Flame Temperature (K)
         gamma_nzl = 1.3845;         % gamma at nozzle throat
     
-    else                            % Equivalence Ratio > 1, fuel rich
+    else                            
+% ------------------------ Fuel Rich Combustion ------------------------- % 
+% C3.85 H4.85 N0.43 + (1/phi)(A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2 + (F)C3.85 H4.85 N0.43
+% C: 3.85 = D + 3.85F
+% H: 4.85 = 2B + 4.85F
+% N: 0.43 + 2*0.79*A*(1/phi) = 2E + 0.43F
+% O: 2*0.21*A*(1/phi) = B + 2D
+% ----------------------------------------------------------------------- % 
+molair = mol_st(1);
+% syms B D E F
+% eqn1 = D + 3.85*F == 3.85;
+% eqn2 = 3*B + 4.85*F == 4.85;
+% eqn3 = 2*E + 0.43*F == 0.43 + (2*0.79*molair)/phi;
+% eqn4 = B + 2*D == (2*0.21*molair)/phi;
+% [LeftMatrix,RightMatrix] = equationsToMatrix([eqn1, eqn2, eqn3, eqn4],[B, D, E, F]);
+% mol_fr = vpa(linsolve(LeftMatrix,RightMatrix));
+
         
         T_AFT = 3189.37;            % Adiabatic Flame Temperature (K)
         gamma_nzl = 1.3845;         % gamma at nozzle throat        
@@ -45,7 +86,7 @@ phi = f_yield/f_st;                 % Equivalence Ratio
 
 % Calculate heat of combustion
 
-    reacttemp = 475 %K
+    reacttemp = 475; %K
     molf = 1; %Moles of fuel (stoichiometric)
     molair = 24.107;
     molh2o = 2.425;
@@ -89,11 +130,11 @@ phi = f_yield/f_st;                 % Equivalence Ratio
     cpn2 = 1.04;
 
     %Molar Cp values
-    mcpabs = cpabs*mwabs
-    mcpair = cpair*mwair
-    mcph2o = cph2o*mwh2o
-    mcpco2 = cpco2*mwco2
-    mcpn2 = cpn2*mwn2
+    mcpabs = cpabs*mwabs;
+    mcpair = cpair*mwair;
+    mcph2o = cph2o*mwh2o;
+    mcpco2 = cpco2*mwco2;
+    mcpn2 = cpn2*mwn2;
 
     %Mole Fractions
     mfabs = molf/molr;
@@ -104,7 +145,7 @@ phi = f_yield/f_st;                 % Equivalence Ratio
 
     %Average Molar Cp values
     mcpr = (mfabs * mcpabs) + (mfair * mcpair); %Reactants
-    mcpp = (mfh2o * mcph2o) + (mfco2 * mcpco2) + (mfn2 * mcpn2)
+    mcpp = (mfh2o * mcph2o) + (mfco2 * mcpco2) + (mfn2 * mcpn2);
 
     %HEAT OF COMBUSTION*
 
@@ -123,13 +164,13 @@ phi = f_yield/f_st;                 % Equivalence Ratio
 
     %Heat of reaction determined, then multiplied by -1 to get heat of combustion.
 
-    molhrxn = h2oterm + co2term - absterm + (molp * mcpp * (reacttemp - tstp)) - (molr * mcpr * (reacttemp - tstp))
+    molhrxn = h2oterm + co2term - absterm + (molp * mcpp * (reacttemp - tstp)) - (molr * mcpr * (reacttemp - tstp));
 
     hrxn = molhrxn/mwabs;
 
     hoc = hrxn * -1;
 
-    fprintf("Heat of Combustion: %f kJ/kg\n", hoc)
+    %fprintf("Heat of Combustion: %f kJ/kg\n", hoc);
         
 
 end

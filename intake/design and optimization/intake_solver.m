@@ -18,11 +18,6 @@ if exist('T','var')==0
     load GRAM_Model.mat
 end
 
-
-
-
-
-
 % define variables
 gamma = 1.4;
 R = 287;  %<J/(kg*K)>
@@ -50,36 +45,51 @@ normalCompMach1 = mach(1) * sind(shockAngle);
 
 [~, tempRatio(2), presRatio(2), densRatio(2), ~, stagPresRatio(2)] = ...
     flownormalshock(gamma, normalCompMach1, 'mach'); 
+stagPres(2) = stagPres(1) * stagPresRatio(2);
+stagDens(2) = stagDens(1);
+stagTemp(2) = stagTemp(1);
 staticDens(2) = staticDens(1) * densRatio(2);
 staticPres(2) = staticPres(1) * presRatio(2);
 staticTemp(2) = staticTemp(1) * tempRatio(2);
 [~, ~, ~, ~, aThroat_a2star] = flowisentropic(gamma, mach(2), 'mach'); 
 
-while true
-    radiusThroat = radiusCombustor
-    areaThroat =  pi*radiusThroat^2;
-    area2star = areaThroat / aThroat_a2star;
+% Terminating Normal Shock Procedure 
+[~, tempRatio(3), presRatio(3), densRatio(3), mach(3), stagPresRatio(3)] = ...
+    flownormalshock(gamma, mach(2), 'mach'); 
+stagPres(3) = stagPres(2) * stagPresRatio(3);
+stagDens(3) = stagDens(2);
+stagTemp(3) = stagTemp(2);
+staticDens(3) = staticDens(2) * densRatio(3);
+staticPres(3) = staticPres(2) * presRatio(3);
+staticTemp(3) = staticTemp(2) * tempRatio(3);
 
-    % Terminating Normal Shock Procedure 
-    [~, tempRatio(3), presRatio(3), densRatio(3), mach(3), stagPresRatio(3)] = ...
-        flownormalshock(gamma, mach(2), 'mach'); 
-    stagDens(3) = staticDens(2) * densRatio(3);
-    stagPres(3) = staticPres(2) * presRatio(3);
-    stagTemp(3) = staticTemp(2) * tempRatio(3);
-    
-    area3star = area2star / stagPresRatio(3);
+radiusThroat(1) = radiusCombustor;  % initial guess
+i = 1;
+
+while true
+    areaThroat(i) =  pi*radiusThroat(i)^2;
+    area2star(i) = areaThroat(i) / aThroat_a2star;
+    area3star(i) = area2star(i) / stagPresRatio(3);
   
-   [mach(4), tempRatio(4), presRatio(4), densRatio(4), ~] = flowisentropic(gamma, (areaCombustor/area3star), 'sub'); 
-    staticDens(4) = stagDens(3)*densRatio(4);
-    staticPres(4) = stagPres(3)*presRatio(4);
-    staticTemp(4) = stagTemp(3)*tempRatio(4);
+   [mach4(i), tempRatio4(i), presRatio4(i), densRatio4(i), ~] = ...
+       flowisentropic(gamma, (areaCombustor/area3star(i)), 'sub'); 
+    staticDens4(i) = stagDens(3)*densRatio4(i);
+    staticPres4(i) = stagPres(3)*presRatio4(i);
+    staticTemp4(i) = stagTemp(3)*tempRatio4(i);
     
-    change = (staticPres(4)/pressureCombustor - 1)
-    radiusThroat = radiusThroat + change 
-    if change < eps('single')
+    change(i) = (staticPres4(i)/pressureCombustor - 1);
+    error(i) = pressureCombustor - staticPres4(i);
+    
+    if abs(change(i)) < eps('single')
         break
     end
+    radiusThroat(i+1) = radiusThroat(i) + change(i)/10;
+    i = i+1;
 end
 
+plot(areaThroat,abs(error))
 
+% [x,ind] = min(abs(error));
+% disp(x)
+% disp(mach1(ind))
 

@@ -12,84 +12,169 @@
 % --------------  --------  ------------------------------
 % Karam, Samer    02/22/21  Initial Creation 
 % --------------------------------------------------------------------- %
-clc; 
+clc; clear; close all
 
+% Station definitions used for indices
+% station 1: free stream (ambient)
+% station 2: downstream of oblique shock, upstream of normal shock (external ramp)
+% station 3: downstream of normal shock, upstream of subsonic iscentropic expansion (throat)
+% station 4: downstream of subsonic iscentropic expansion combustor inlet,(combustion chamber opening)
+
+% load in atmosphere model based on altitude in km
 if exist('T','var')==0
     load GRAM_Model.mat
 end
 
 % define variables
-gamma = 1.4;
-R = 287;  %<J/(kg*K)>
-mach(1) = 2;                  % free stream mach
-deflectionAngle = 5;
-altitude = 5000e-3;     % altitude at mach 2 (erich's code)    
-radiusCombustor = 0.5;  % in
-areaCombustor =  pi*radiusCombustor^2;
-pressureCombustor = 400e3;  % kPa
-machCombustorLim = 0.2;
+gamma = 1.4;  % specific heat ratio air
+R = 287;  % gas constant air <J/(kg*K)>
+mach1 = 2.5;  % free stream mach
+deflectionAngle = 17;  % single intake ramp deflection angle <deg>
+altitude = 5;     % altitude at mach 2 (erich's code) <km>    
+radiusCowl = 1.25*0.0254;  % radius of cowl <m>
+radiusCombustor = 0.5*0.0254;  % radius of combustion chamber inlet opening <m>
+areaCombustor =  pi*radiusCombustor^2;  % area of combustor inlet <m^2>
+pressureCombustor = 400e3;  % combustion chamber pressure <kPa>
+% machCombustorLim = 0.2;  
 
-%free stream values
-staticDens(1) = interp1(T.Hgtkm, T.DensMean, altitude);       % <kg/m3>
-staticPres(1) = interp1(T.Hgtkm, T.PresMean, altitude);       % <Pa>
-staticTemp(1) = interp1(T.Hgtkm, T.Tmean, altitude);          % <K>
-velocity(1) = mach(1)*sqrt(gamma*R*staticTemp(1));
-[~, tempRatio(1), presRatio(1), densRatio(1), ~] = flowisentropic(gamma, mach(1), 'mach'); 
-stagDens(1) = staticDens(1) / densRatio(1);
-stagPres(1) = staticPres(1) / presRatio(1);
-stagTemp(1) = staticTemp(1) / tempRatio(1);
+stepLim = 1000;  % convergence iteration step limit
+tolerance = 0.0001;  % tolerance for residual
 
-% Oblique Shock Procedure
-[mach(2), shockAngle] = obliqueShock(mach(1), deflectionAngle, gamma); 
-normalCompMach1 = mach(1) * sind(shockAngle); 
-
-[~, tempRatio(2), presRatio(2), densRatio(2), ~, stagPresRatio(2)] = ...
-    flownormalshock(gamma, normalCompMach1, 'mach'); 
-stagPres(2) = stagPres(1) * stagPresRatio(2);
-stagDens(2) = stagDens(1);
-stagTemp(2) = stagTemp(1);
-staticDens(2) = staticDens(1) * densRatio(2);
-staticPres(2) = staticPres(1) * presRatio(2);
-staticTemp(2) = staticTemp(1) * tempRatio(2);
-[~, ~, ~, ~, aThroat_a2star] = flowisentropic(gamma, mach(2), 'mach'); 
-
-% Terminating Normal Shock Procedure 
-[~, tempRatio(3), presRatio(3), densRatio(3), mach(3), stagPresRatio(3)] = ...
-    flownormalshock(gamma, mach(2), 'mach'); 
-stagPres(3) = stagPres(2) * stagPresRatio(3);
-stagDens(3) = stagDens(2);
-stagTemp(3) = stagTemp(2);
-staticDens(3) = staticDens(2) * densRatio(3);
-staticPres(3) = staticPres(2) * presRatio(3);
-staticTemp(3) = staticTemp(2) * tempRatio(3);
-
-radiusThroat(1) = radiusCombustor;  % initial guess
-i = 1;
-
-while true
-    areaThroat(i) =  pi*radiusThroat(i)^2;
-    area2star(i) = areaThroat(i) / aThroat_a2star;
-    area3star(i) = area2star(i) / stagPresRatio(3);
-  
-   [mach4(i), tempRatio4(i), presRatio4(i), densRatio4(i), ~] = ...
-       flowisentropic(gamma, (areaCombustor/area3star(i)), 'sub'); 
-    staticDens4(i) = stagDens(3)*densRatio4(i);
-    staticPres4(i) = stagPres(3)*presRatio4(i);
-    staticTemp4(i) = stagTemp(3)*tempRatio4(i);
-    
-    change(i) = (staticPres4(i)/pressureCombustor - 1);
-    error(i) = pressureCombustor - staticPres4(i);
-    
-    if abs(change(i)) < eps('single')
-        break
-    end
-    radiusThroat(i+1) = radiusThroat(i) + change(i)/10;
-    i = i+1;
+% Station 1 properties (free-stream)-----
+staticDens1 = interp1(T.Hgtkm, T.DensMean, altitude);  % <kg/m3>
+staticPres1 = interp1(T.Hgtkm, T.PresMean, altitude);  % <Pa>
+staticTemp1 = interp1(T.Hgtkm, T.Tmean, altitude);  % <K>
+[~, tempRatio1, presRatio1, densRatio1, ~] = flowisentropic(gamma, mach1, 'mach');  % ratios are static over stagnation
+stagDens1 = staticDens1 / densRatio1;  % <kg/m3>
+stagPres1 = staticPres1 / presRatio1;  % <Pa>
+stagTemp1 = staticTemp1 / tempRatio1;  % <K>
+velocity1 = mach1*sqrt(gamma*R*staticTemp1);  % <m/s>
+if stagPres1 < pressureCombustor
+    error('intake:ambientStagLow',...
+        'Error. \nStagnation pressure too small; cannot reach combustion chamber pressure. \nTry increasing speed or ambient static pressure.');
 end
 
-plot(areaThroat,abs(error))
+% Station 2 properties (oblique shock)-----
+[mach2, shockAngle] = obliqueShock(mach1, deflectionAngle, gamma);  % uniform mach number of external ramp region
+normalCompMach1 = mach1 * sind(shockAngle);  % flow component crossing normal to oblique shock
+[~, tempRatio2, presRatio2, densRatio2, ~, stagPresRatio2] = ...
+    flownormalshock(gamma, normalCompMach1, 'mach');  % ratios are downstream over upstream
+stagPres2 = stagPres1 * stagPresRatio2;  % <Pa>
+stagDens2 = stagDens1;  % does not change over normal shock <kg/m3>
+stagTemp2 = stagTemp1;  % does not change over normal shock <K>
+staticDens2 = staticDens1 * densRatio2;  % <kg/m3>
+staticPres2 = staticPres1 * presRatio2;  % <Pa>
+staticTemp2 = staticTemp1 * tempRatio2;  % <K>
+velocity2 = mach2*sqrt(gamma*R*staticTemp2);  % <m/s>
+[~, ~, ~, ~, aThroat_a2star] = flowisentropic(gamma, mach2, 'mach'); 
+if stagPres2 < pressureCombustor
+    error('intake:obliqueStagLoss',...
+        'Error. \nOblique shock stagnation pressure loss too great; cannot reach combustion chamber pressure. \nTry increasing deflection angle or speed.');
+end
 
-% [x,ind] = min(abs(error));
-% disp(x)
-% disp(mach1(ind))
+% Station 3 properties (normal shock)-----
+[~, tempRatio3, presRatio3, densRatio3, mach3, stagPresRatio3] = ...
+    flownormalshock(gamma, mach2, 'mach');  % ratios are downstream over upstream
+stagPres3 = stagPres2 * stagPresRatio3;  % <Pa>
+stagDens3 = stagDens2;  % does not change over normal shock <kg/m3>
+stagTemp3 = stagTemp2;  % does not change over normal shock <K>
+staticDens3 = staticDens2 * densRatio3;  % <kg/m3>
+staticPres3 = staticPres2 * presRatio3;  % <Pa>
+staticTemp3 = staticTemp2 * tempRatio3;  % <K>
+velocity3 = mach3*sqrt(gamma*R*staticTemp3);  % <m/s>
+if stagPres3 < pressureCombustor
+    error('intake:normalStagLoss',...
+        'Error. \nNormal shock stagnation pressure loss too great; cannot reach combustion chamber pressure. \nTry reducing the strength of the normal shock.');
+else
+    % Station 4 properties (subsonic iscentropic expansion)-----
+    stagPres4 = stagPres3;  % does not change; iscentropic <Pa>
+    stagDens4 = stagDens3;  % does not change; iscentropic <kg/m3>
+    stagTemp4 = stagTemp3;  % does not change; iscentropic <K>
+    
+%     radiusThroat(1) = radiusCowl/2;  % first guess
+%     radiusThroat(2) = radiusThroat(1) - 0.01;  % second guess
+
+
+    % pre-allocate arrays
+    areaThroat = zeros(stepLim,1);
+    area2star = zeros(stepLim,1);
+    area3star = zeros(stepLim,1);
+    aCombustor_a3star = zeros(stepLim,1);
+    mach4 = zeros(stepLim,1);
+    tempRatio4 = zeros(stepLim,1);
+    presRatio4 = zeros(stepLim,1);
+    densRatio4 = zeros(stepLim,1);
+    staticDens4 = zeros(stepLim,1);
+    staticPres4 = zeros(stepLim,1);
+    staticTemp4 = zeros(stepLim,1);
+    residual = zeros(stepLim,1);
+    convergeFlag = 0;
+    ind = 0;
+    areaThroat(1) = areaCombustor/5;
+    areaThroat(2) = areaThroat(1)-0.00001;
+    % secant method to converge on radius of throat
+    for i=1:stepLim
+        if i < 3
+            % ignore first 2 steps (guesses)
+        else
+%             change = radiusThroat(i-1) - radiusThroat(i-2);
+            change = areaThroat(i-1) - areaThroat(i-2);
+            if abs(change) < eps()
+                convergeFlag = 1;  % flag for iterative convergence
+            end
+%             radiusThroat(i) = radiusThroat(i-1) - (residual(i-1)*change) /...
+%                 (residual(i-1)-residual(i-2));
+            areaDelta = (residual(i-1)*change) /(residual(i-1)-residual(i-2));
+            areaThroat(i) = areaThroat(i-1) - (areaDelta/10);
+        end
+%         areaThroat(i) =  pi*radiusCowl^2 - pi*radiusThroat(i)^2;  % annular area between cowl and throat radius
+        area2star(i) = areaThroat(i) / aThroat_a2star;  % sonic area before normal shock
+        area3star(i) = area2star(i) / stagPresRatio3;  % sonic area after normal shock
+        aCombustor_a3star(i) = areaCombustor/area3star(i);
+        [mach4(i), tempRatio4(i), presRatio4(i), densRatio4(i), ~] = ...
+            flowisentropic(gamma, (aCombustor_a3star(i)), 'sub');  % ratios are static over stagnation
+        staticDens4(i) = stagDens4*densRatio4(i);
+        staticPres4(i) = stagPres4*presRatio4(i);
+        staticTemp4(i) = stagTemp4*tempRatio4(i);
+        residual(i) = pressureCombustor - staticPres4(i);
+        if convergeFlag == 1
+            ind = i;
+            break
+        end
+        if abs(residual(i)) < tolerance
+            ind = i;
+            break
+        end
+%         if i == 1000
+%             ind = i;
+%         end
+        ind = i;
+        i = i+1;
+    end
+    
+    massflow3 = staticDens3*velocity3*areaThroat(ind);  % <kg/s>
+    velocity4 = mach4(ind)*sqrt(gamma*R*staticTemp4(ind));  % <m/s>
+    massflow4 = staticDens4(ind)*velocity4*areaCombustor;  % <kg/s>
+    
+    % plotting
+    hold off
+%     figure
+%     title('areaThroat')
+%     plot(1:ind, areaThroat(1:ind))
+%     figure
+%     title('areaThroat')
+%     plot(1:ind, area2star(1:ind))
+%     plot(1:ind, area3star(1:ind))
+%     plot(1:ind, mach4(1:ind))
+%     plot(1:ind, tempRatio4(1:ind))
+%     plot(1:ind, presRatio4(1:ind))
+%     plot(1:ind, densRatio4(1:ind))
+%     plot(1:ind, staticDens4(1:ind))
+%     plot(1:ind, staticPres4(1:ind))
+%     plot(1:ind, staticTemp4(1:ind))
+    figure
+    plot(1:ind, abs(residual(1:ind)))
+    title('residual')
+    
+end
 

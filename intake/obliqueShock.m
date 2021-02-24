@@ -42,5 +42,9 @@ shockAngle = theta;
 % equation 6.17 downstream mach number
 mach2 = sqrt( (1+(gamma-1)/2*mach1^2)/((gamma*mach1^2*sind(theta)^2)- (gamma - 1)/2)...
     + ( mach1^2*cosd(theta)^2/(1 + (gamma - 1)/2*mach1^2*sind(theta)^2) )) ;
+if ~isreal(mach2)
+    error('aero:obliqueDetach',...
+        'Error. \nSolution invalid; oblique shock detached. Try lowering deflection angle');
+end
 end
 

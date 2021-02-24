@@ -35,7 +35,6 @@ radiusCowl = 1.25*0.0254;  % radius of cowl <m>
 radiusCombustor = 0.5*0.0254;  % radius of combustion chamber inlet opening <m>
 areaCombustor =  pi*radiusCombustor^2;  % area of combustor inlet <m^2>
 pressureCombustor = 400e3;  % combustion chamber pressure <kPa>
-% machCombustorLim = 0.2;  
 
 stepLim = 1000;  % convergence iteration step limit
 tolerance = 0.0001;  % tolerance for residual
@@ -60,7 +59,7 @@ normalCompMach1 = mach1 * sind(shockAngle);  % flow component crossing normal to
 [~, tempRatio2, presRatio2, densRatio2, ~, stagPresRatio2] = ...
     flownormalshock(gamma, normalCompMach1, 'mach');  % ratios are downstream over upstream
 stagPres2 = stagPres1 * stagPresRatio2;  % <Pa>
-stagDens2 = stagDens1;  % does not change over normal shock <kg/m3>
+stagDens2 = stagDens1 * stagPresRatio2;  % changes with the same rate as pressure (ideal gas law) <kg/m3>
 stagTemp2 = stagTemp1;  % does not change over normal shock <K>
 staticDens2 = staticDens1 * densRatio2;  % <kg/m3>
 staticPres2 = staticPres1 * presRatio2;  % <Pa>
@@ -76,7 +75,7 @@ end
 [~, tempRatio3, presRatio3, densRatio3, mach3, stagPresRatio3] = ...
     flownormalshock(gamma, mach2, 'mach');  % ratios are downstream over upstream
 stagPres3 = stagPres2 * stagPresRatio3;  % <Pa>
-stagDens3 = stagDens2;  % does not change over normal shock <kg/m3>
+stagDens3 = stagDens2 * stagPresRatio3;  % changes with the same rate as pressure (ideal gas law) <kg/m3>
 stagTemp3 = stagTemp2;  % does not change over normal shock <K>
 staticDens3 = staticDens2 * densRatio3;  % <kg/m3>
 staticPres3 = staticPres2 * presRatio3;  % <Pa>
@@ -86,15 +85,11 @@ if stagPres3 < pressureCombustor
     error('intake:normalStagLoss',...
         'Error. \nNormal shock stagnation pressure loss too great; cannot reach combustion chamber pressure. \nTry reducing the strength of the normal shock.');
 else
+    
     % Station 4 properties (subsonic iscentropic expansion)-----
     stagPres4 = stagPres3;  % does not change; iscentropic <Pa>
     stagDens4 = stagDens3;  % does not change; iscentropic <kg/m3>
     stagTemp4 = stagTemp3;  % does not change; iscentropic <K>
-    
-%     radiusThroat(1) = radiusCowl/2;  % first guess
-%     radiusThroat(2) = radiusThroat(1) - 0.01;  % second guess
-
-
     % pre-allocate arrays
     areaThroat = zeros(stepLim,1);
     area2star = zeros(stepLim,1);
@@ -110,8 +105,9 @@ else
     residual = zeros(stepLim,1);
     convergeFlag = 0;
     ind = 0;
-    areaThroat(1) = areaCombustor/5;
-    areaThroat(2) = areaThroat(1)-0.00001;
+    areaThroat(1) = areaCombustor/5;  % first guess
+    areaThroat(2) = areaThroat(1)-0.00001;  % second guess
+    
     % secant method to converge on radius of throat
     for i=1:stepLim
         if i < 3
@@ -122,8 +118,8 @@ else
                 convergeFlag = 1;  % flag for iterative convergence
             end
 
-            areaDelta = (residual(i-1)*change) /(residual(i-1)-residual(i-2));
-            areaThroat(i) = areaThroat(i-1) - (areaDelta/10);
+            areaDelta = (residual(i-1)*change) / (residual(i-1)-residual(i-2));
+            areaThroat(i) = areaThroat(i-1) - (areaDelta/10);  % divided by 10 to slow down convergence
         end
 
         area2star(i) = areaThroat(i) / aThroat_a2star;  % sonic area before normal shock
@@ -147,53 +143,83 @@ else
         i = i+1;
     end
     radiusThroat = sqrt((pi*radiusCowl^2 - areaThroat(ind))/pi);
-    massflow3 = staticDens3*velocity3*areaThroat(ind);  % <kg/s> *************not the same as massflow4*********
+    massflow2 = staticDens2*velocity2*areaThroat(ind);  % % <kg/s>
+    massflow3 = staticDens3*velocity3*areaThroat(ind);  % <kg/s>
     velocity4 = mach4(ind)*sqrt(gamma*R*staticTemp4(ind));  % <m/s>
     massflow4 = staticDens4(ind)*velocity4*areaCombustor;  % <kg/s>
     
-    % plotting
+ %% properties plots
     
     stagPres = [stagPres1 stagPres2 stagPres3 stagPres4];
     figure
-    plot(stagPres)
+    scatter(1:4,stagPres)
     title('Stagnation Pressure')
     
     staticPres = [staticPres1 staticPres2 staticPres3 staticPres4(ind)];
     figure
-    plot(staticPres)
+    scatter(1:4,staticPres)
     title('Static Pressure')
     
-    stagDens = [stagDens1 stagDens2 stagDens3 stagDens4];
-    figure
-    plot(stagDens)
-    title('Stagnation Density')    
+%     stagDens = [stagDens1 stagDens2 stagDens3 stagDens4];
+%     figure
+%     scatter(1:4,stagDens)
+%     title('Stagnation Density')    
     
     staticDens = [staticDens1 staticDens2 staticDens3 staticDens4(ind)];
     figure
-    plot(staticDens)
+    scatter(1:4,staticDens)
     title('staticDens')
     
-    stagTemp = [stagTemp1 stagTemp2 stagTemp3 stagTemp4];
-    figure
-    plot(stagTemp)
-    title('stagTemp')
+%     stagTemp = [stagTemp1 stagTemp2 stagTemp3 stagTemp4];
+%     figure
+%     scatter(1:4,stagTemp)
+%     title('stagTemp')
         
     staticTemp = [staticTemp1 staticTemp2 staticTemp3 staticTemp4(ind)];
     figure
-    plot(staticTemp)
+    scatter(1:4,staticTemp)
     title('staticTemp')
     
     mach = [mach1 mach2 mach3 mach4(ind)];
     figure
-    plot(mach)
+    scatter(1:4,mach)
     title('Mach')
         
     velocity = [velocity1 velocity2 velocity3 velocity4];
     figure
-    plot(velocity)
+    scatter(1:4,velocity)
     title('Velocity')
+    
+    
+    
+%%    geometry plots
+% solve for ramp length
+spikeLength = radiusThroat/sind(deflectionAngle);
+subDiffuserLength = spikeLength/2;
+totalLength = spikeLength + subDiffuserLength;
+subDiffuserSlope = -radiusThroat/subDiffuserLength;
+topslopeCowlx = totalLength + (radiusCowl-radiusCombustor)/subDiffuserSlope;  % used to match slope of sub diffuser line to intersect with cowl
+buffer = totalLength/10;
+% solve for shocks
+obliqueShockHgt = sind(shockAngle)*spikeLength;
+
+f1 = figure('Name','ramp shock structure');
+hold on
+% plot surfaces
+plot([0,totalLength+buffer],[0,0],':k', 'LineWidth',2);  % centerline
+plot([spikeLength,totalLength+buffer],[radiusCowl,radiusCowl],'k', 'LineWidth',2);  % cowl line
+plot([0,spikeLength],[0,radiusThroat], 'k', 'LineWidth',2);  % spike ramp line
+plot([spikeLength,totalLength],[radiusThroat,0], 'k', 'LineWidth',2);  % subsonic diffuser ramp line
+plot([topslopeCowlx,totalLength],[radiusCowl,radiusCombustor], 'k', 'LineWidth',2);  % subsonic top slope ramp line
+plot([totalLength,totalLength],[radiusCombustor,radiusCowl], 'k', 'LineWidth',2);  % combustor inlet
+
+% plot shocks
+plot([0,spikeLength],[0,obliqueShockHgt], '--c');  % oblique shock
+plot([spikeLength,spikeLength],[radiusThroat,radiusCowl], '--c');  % Normal Shcok
+hold off
         
-    % iteration plots
+%% iteration plots
+
 %     plot(1:ind, areaThroat(1:ind))
 %     title('areaThroat')
 %     figure

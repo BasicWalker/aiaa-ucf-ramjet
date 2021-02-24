@@ -28,7 +28,7 @@ end
 % define variables
 gamma = 1.4;  % specific heat ratio air
 R = 287;  % gas constant air <J/(kg*K)>
-mach1 = 2.5;  % free stream mach
+mach1 = 2.1;  % free stream mach
 deflectionAngle = 17;  % single intake ramp deflection angle <deg>
 altitude = 5;     % altitude at mach 2 (erich's code) <km>    
 radiusCowl = 1.25*0.0254;  % radius of cowl <m>
@@ -117,17 +117,15 @@ else
         if i < 3
             % ignore first 2 steps (guesses)
         else
-%             change = radiusThroat(i-1) - radiusThroat(i-2);
             change = areaThroat(i-1) - areaThroat(i-2);
             if abs(change) < eps()
                 convergeFlag = 1;  % flag for iterative convergence
             end
-%             radiusThroat(i) = radiusThroat(i-1) - (residual(i-1)*change) /...
-%                 (residual(i-1)-residual(i-2));
+
             areaDelta = (residual(i-1)*change) /(residual(i-1)-residual(i-2));
             areaThroat(i) = areaThroat(i-1) - (areaDelta/10);
         end
-%         areaThroat(i) =  pi*radiusCowl^2 - pi*radiusThroat(i)^2;  % annular area between cowl and throat radius
+
         area2star(i) = areaThroat(i) / aThroat_a2star;  % sonic area before normal shock
         area3star(i) = area2star(i) / stagPresRatio3;  % sonic area after normal shock
         aCombustor_a3star(i) = areaCombustor/area3star(i);
@@ -145,36 +143,89 @@ else
             ind = i;
             break
         end
-%         if i == 1000
-%             ind = i;
-%         end
         ind = i;
         i = i+1;
     end
-    
-    massflow3 = staticDens3*velocity3*areaThroat(ind);  % <kg/s>
+    radiusThroat = sqrt((pi*radiusCowl^2 - areaThroat(ind))/pi);
+    massflow3 = staticDens3*velocity3*areaThroat(ind);  % <kg/s> *************not the same as massflow4*********
     velocity4 = mach4(ind)*sqrt(gamma*R*staticTemp4(ind));  % <m/s>
     massflow4 = staticDens4(ind)*velocity4*areaCombustor;  % <kg/s>
     
     % plotting
-    hold off
-%     figure
-%     title('areaThroat')
-%     plot(1:ind, areaThroat(1:ind))
-%     figure
-%     title('areaThroat')
-%     plot(1:ind, area2star(1:ind))
-%     plot(1:ind, area3star(1:ind))
-%     plot(1:ind, mach4(1:ind))
-%     plot(1:ind, tempRatio4(1:ind))
-%     plot(1:ind, presRatio4(1:ind))
-%     plot(1:ind, densRatio4(1:ind))
-%     plot(1:ind, staticDens4(1:ind))
-%     plot(1:ind, staticPres4(1:ind))
-%     plot(1:ind, staticTemp4(1:ind))
+    
+    stagPres = [stagPres1 stagPres2 stagPres3 stagPres4];
     figure
-    plot(1:ind, abs(residual(1:ind)))
-    title('residual')
+    plot(stagPres)
+    title('Stagnation Pressure')
+    
+    staticPres = [staticPres1 staticPres2 staticPres3 staticPres4(ind)];
+    figure
+    plot(staticPres)
+    title('Static Pressure')
+    
+    stagDens = [stagDens1 stagDens2 stagDens3 stagDens4];
+    figure
+    plot(stagDens)
+    title('Stagnation Density')    
+    
+    staticDens = [staticDens1 staticDens2 staticDens3 staticDens4(ind)];
+    figure
+    plot(staticDens)
+    title('staticDens')
+    
+    stagTemp = [stagTemp1 stagTemp2 stagTemp3 stagTemp4];
+    figure
+    plot(stagTemp)
+    title('stagTemp')
+        
+    staticTemp = [staticTemp1 staticTemp2 staticTemp3 staticTemp4(ind)];
+    figure
+    plot(staticTemp)
+    title('staticTemp')
+    
+    mach = [mach1 mach2 mach3 mach4(ind)];
+    figure
+    plot(mach)
+    title('Mach')
+        
+    velocity = [velocity1 velocity2 velocity3 velocity4];
+    figure
+    plot(velocity)
+    title('Velocity')
+        
+    % iteration plots
+%     plot(1:ind, areaThroat(1:ind))
+%     title('areaThroat')
+%     figure
+%     plot(1:ind, area2star(1:ind))
+%     title('area2star')
+%     figure
+%     plot(1:ind, area3star(1:ind))
+%     title('area3star')
+%     figure
+%     plot(1:ind, mach4(1:ind))
+%     title('mach4')
+%     figure
+%     plot(1:ind, tempRatio4(1:ind))
+%     title('tempRatio4')
+%     figure
+%     plot(1:ind, presRatio4(1:ind))
+%     title('presRatio4')
+%     figure
+%     plot(1:ind, densRatio4(1:ind))
+%     title('densRatio4')
+%     figure
+%     plot(1:ind, staticDens4(1:ind))
+%     title('staticDens4')
+%     figure
+%     plot(1:ind, staticPres4(1:ind))
+%     title('staticPres4')
+%     figure
+%     plot(1:ind, staticTemp4(1:ind))
+%     title('staticTemp4')
+%     figure
+%     plot(1:ind, abs(residual(1:ind)))
+%     title('residual')
     
 end
 

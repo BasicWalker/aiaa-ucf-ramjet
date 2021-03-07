@@ -69,14 +69,25 @@ if(phi == 1)                            %  Fuel lean Combustion
 % N: 0.43 + 2*0.79*A*(1/phi) = 2E + 0.43F
 % O: 2*0.21*A*(1/phi) = B + 2D
 % ----------------------------------------------------------------------- % 
+phi = 1.3;
 molair = mol_st(1);
-% syms B D E F
-% eqn1 = D + 3.85*F == 3.85;
-% eqn2 = 3*B + 4.85*F == 4.85;
-% eqn3 = 2*E + 0.43*F == 0.43 + (2*0.79*molair)/phi;
-% eqn4 = B + 2*D == (2*0.21*molair)/phi;
-% [LeftMatrix,RightMatrix] = equationsToMatrix([eqn1, eqn2, eqn3, eqn4],[B, D, E, F]);
-% mol_fr = vpa(linsolve(LeftMatrix,RightMatrix));
+ syms B D E F
+ eqn1 = D + 3.85*F == 3.85;
+ eqn2 = 2*B + 4.85*F == 4.85;
+ eqn3 = 2*E + 0.43*F == 0.43 + (2*0.79*molair)/phi;
+ eqn4 = B + 2*D == (2*0.21*molair)/phi;
+ [LeftMatrix,RightMatrix] = equationsToMatrix([eqn1, eqn2, eqn3, eqn4],[B, D, E, F]);
+ mol_fr = vpa(linsolve(LeftMatrix,RightMatrix))
+
+F = (15.4/20.25) - ((15.4 * 0.21 * molair * (1/phi))/(20.25 * 3.85)) - (4.85/20.25);
+D = 3.85 - 3.85*F;
+B = 2*0.21*molair*(1/phi) - 2*D;
+E = (0.43 - 0.43*F + 2*0.79*molair*(1/phi))/2;
+
+mol_handcalc = [B D E F]
+
+
+
 
         
         T_AFT = 3189.37;            % Adiabatic Flame Temperature (K)

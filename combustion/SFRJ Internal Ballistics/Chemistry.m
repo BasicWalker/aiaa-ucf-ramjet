@@ -105,14 +105,14 @@ classdef Chemistry
                 / abs(sum(mol_mat(3:end).*self.CpMat(3:end)));
         end
         
-        function [phi, T_AFT, mol_mat] = phiSolver(self, f, T_air)
+        function [phi, T_AFT] = phiSolver(self, f, T_air)
             % ----------------- Initialize Values ----------------- % 
-            f_yield = f;                                                        % Actual fuel to air ratio     
+            f_yield = f;  % Actual fuel to air ratio     
             phi = f_yield/self.f_st;
 
             if(phi == 1)  
             % ------------------------ Stoichiometric Combustion -------------------- % 
-            % C3.85 H4.85 N0.43 + (1/phi)(A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2 + (F)O2
+            % C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
             % ----------------------------------------------------------------------- %     
                 air_coeff = self.mol_st(1)/phi;
                 %     b  d  e  f g
@@ -133,7 +133,7 @@ classdef Chemistry
 
             elseif(phi < 1)                    
             % ------------------------ Fuel lean Combustion ------------------------- % 
-            % C3.85 H4.85 N0.43 + (1/phi)(A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2 + (F)O2
+            % C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
             % ----------------------------------------------------------------------- % 
                 air_coeff = self.mol_st(1)/phi;
                 %     b  d  e  f g
@@ -152,7 +152,7 @@ classdef Chemistry
             else   
 
             % ------------------------ Fuel Rich Combustion ------------------------- % 
-            % C3.85 H4.85 N0.43 + (1/phi)(A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2 + (g)C3.85 H4.85 N0.43
+            % C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
             % ----------------------------------------------------------------------- % 
                 air_coeff = self.mol_st(1)/phi;
                 %     b  d  e f  g

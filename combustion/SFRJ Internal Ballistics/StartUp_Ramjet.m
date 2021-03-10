@@ -68,7 +68,7 @@ gamma_Inlt      = 1.3845;                   % Specific heat ratio of air
 InltSpeedSnd    = sqrt(gamma_Inlt*R*InltTemp);% Speed of Sound at inlet (m/s)
 InltMach        = 0.2;                      % Mach number at the inlet
 InltVel(1)      = InltMach*InltSpeedSnd;    % Velocity of air at the inlet
-InltMassFlw     = InltRho*InltVel*InltArea; % Mass flow rate of air at the inlet
+InltMassFlw     = 0.75; %InltRho*InltVel*InltArea; % Mass flow rate of air at the inlet
 
 % ----------------------------- Nozzle ----------------------------- %
 
@@ -78,6 +78,7 @@ NzlAT           = pi*(NzlThrtDia/2)^2;      % Throat area (m^2)
 % --------------- Chemistry User Defined Parameters ---------------- %
 
 Phi             = 1.0;                      % Equivalence ratio
+chem = Chemistry();
 
 % ----------------- Trajectory Initial Conditions ------------------ %
                     

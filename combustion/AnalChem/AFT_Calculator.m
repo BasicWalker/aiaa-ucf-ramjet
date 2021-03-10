@@ -34,7 +34,7 @@ Cp_H2O = 36.57;  % molar specific heat  <kJ/kmol*K>
 Cp_N2  = 29.02;   % molar specific heat  <kJ/kmol*K>
 Cp_O2  = 29.376;  % molar specific heat  <kJ/kmol*K> 
 
-CpMat = [Cp_ABS Cp_air  Cp_CO2 Cp_H2O Cp_N2 Cp_N2];
+CpMat = [Cp_ABS Cp_air  Cp_CO2 Cp_H2O Cp_N2 Cp_O2];
 hfMat = [hf_ABS hf_air  hf_CO2 hf_H2O hf_N2 hf_O2];
 T_r   = [T_ABS T_air T_STP T_STP T_STP T_STP]; 
 

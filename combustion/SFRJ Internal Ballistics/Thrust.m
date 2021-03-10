@@ -26,10 +26,6 @@ end
 % Thrust Calculations 
 Thrustdlvd(n) = MassGen(n)*CStar(n)/SFRJDt; % Thrust delivered, assuming thrust coefficient = 1.0
 
-MdotTotal(n) = 
-
-
-Thrustdlvd2(n) = 
 
 
 Impulse(n) = Thrustdlvd(n)*SFRJDt;          % Impulse delivered

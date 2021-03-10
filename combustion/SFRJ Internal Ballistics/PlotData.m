@@ -46,7 +46,7 @@ legend('Thrust Curve','Drag')
 grid on
 
 figure('Name','Mass Flow Rate')
-plot(BurnTime,MassFlow, BurnTime, MdotAir, BurnTime, MdotFuel)
+plot(BurnTime,MassFlow, BurnTime, MdotAir, BurnTime, MdotFuel) %
 title('Mass Flow Rate')
 xlabel('Time (s)')
 ylabel('Mass (kg/s)')
@@ -111,6 +111,14 @@ xlabel('Time (s)')
 ylabel('Equivalence Ratio (phi)')
 grid on
 ylim([0 8])
+
+figure('Name','Adiabatic Flame Temperature')
+plot(BurnTime,T_stag)
+title('Adiabatic Flame Temperature vs Time')
+xlabel('Time (s)')
+ylabel('Temperature <k>')
+grid on
+% ylim([0 8])
 
 fprintf('\n------------ Simulation Results ------------\n')
 fprintf('Burn Time:             %.2f   (s)\n', BurnTime(n-1))

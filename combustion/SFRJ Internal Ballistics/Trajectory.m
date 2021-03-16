@@ -22,7 +22,7 @@ if (n > 1)
     pressure_atm(n) = pressure_atm(n)*(1/Pa2kPa);
     temperature(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(n))/1e3);
     flight_mach(n) = velocity(n)/sqrt(gamma_atm*R*temperature(n));
-    drag(n) = c_d*0.5*density(n)*velocity(n)^2*S;
+    drag(n) = c_d*0.5*Rho_atm(n)*velocity(n)^2*S;
     mass(n) = dry_mass + FuelMass(n);
     weight(n) = gravity*mass(n);
     acceleration(n) = (Thrustdlvd(n) - drag(n) - weight(n))/ mass(n);

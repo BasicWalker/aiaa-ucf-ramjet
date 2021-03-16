@@ -70,7 +70,7 @@ grid on
 % grid on
 
 figure('Name','Pressure Plots')
-plot(BurnTime, InltPres, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
+plot(BurnTime, InltPres_stag, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
 title('Pressure Plots')
 xlabel('Time (s)')
 ylabel('Pressure (kPa)')
@@ -110,7 +110,7 @@ title('Equivalence Ratio vs Time')
 xlabel('Time (s)')
 ylabel('Equivalence Ratio (phi)')
 grid on
-ylim([0 8])
+ylim([0 11])
 
 figure('Name','Adiabatic Flame Temperature')
 plot(BurnTime,T_stag)
@@ -121,12 +121,16 @@ grid on
 % ylim([0 8])
 
 fprintf('\n------------ Simulation Results ------------\n')
-fprintf('Burn Time:             %.2f   (s)\n', BurnTime(n-1))
-fprintf('Average Thrust:        %.2f  (N)\n', mean(Thrustdlvd))
-fprintf('Total Impulse:         %.2f (Ns)\n', TotallImp(n-1))
-fprintf('Inlet Velocity:        %.2f   (m/s)\n', InltVel(n-1))
-fprintf('Inlet Mass Flow Rate:  %.3f   (kg/s)\n', InltMassFlw)
-fprintf('PC From TAFT:          %.2f  (kPa)\n',mean(PC_TAFT))
-fprintf('Initial Step Height:   %.2f    (in) \n', StepHeight(1)*In2Mtr)
-fprintf('Average O/F Ratio:     %.2f      \n',mean(OFRatio))
+fprintf('Burn Time:                 %.2f   (s)\n', BurnTime(n-1))
+fprintf('Average Thrust:            %.2f  (N)\n', mean(Thrustdlvd))
+fprintf('Total Impulse:             %.2f (Ns)\n', TotallImp(n-1))
+fprintf('Inlet Mass Flow Rate:      %.3f   (kg/s)\n', mean(InltMassFlw))
+fprintf('PC From TAFT:              %.2f  (kPa)\n',mean(PC_TAFT))
+fprintf('Initial Step Height:       %.2f    (in) \n', StepHeight(1)*In2Mtr)
+fprintf('Average Inlet Velocity:    %.2f   (m/s)\n', mean(InltVel))
+fprintf('Average Inlet Mach:        %.2f  \n', mean(InltMach))
+fprintf('Average O/F Ratio:         %.2f      \n',mean(OFRatio))
+fprintf('Average Equivalence Ratio: %.2f  \n',mean(phi))
 fprintf('--------------------------------------------\n')
+
+

@@ -66,26 +66,26 @@ classdef Chemistry
             hf_air = 0;         % molar enthalpy of formation <kJ/kmol>
             hf_CO2 = -393520;   % molar enthalpy of formation <kJ/kmol>
             hf_H2O = -241820;   % molar enthalpy of formation <kJ/kmol>
-            hf_N2  = 0;          % molar enthalpy of formation <kJ/kmol>
+            hf_N2  = 0;         % molar enthalpy of formation <kJ/kmol>
             hf_O2  = 0; 
             
-            Cp_air = 29.67;  % molar specific heat  <kJ/kmol*K>
-            Cp_CO2 = 37.22;  % molar specific heat  <kJ/kmol*K>
-            Cp_H2O = 36.57;  % molar specific heat  <kJ/kmol*K>
-            Cp_N2  = 29.02;   % molar specific heat  <kJ/kmol*K>
-            Cp_O2  = 29.376;  % molar specific heat  <kJ/kmol*K> 
+            Cp_air = 29.67;     % molar specific heat  <kJ/kmol*K>
+            Cp_CO2 = 37.22;     % molar specific heat  <kJ/kmol*K>
+            Cp_H2O = 36.57;     % molar specific heat  <kJ/kmol*K>
+            Cp_N2  = 29.02;     % molar specific heat  <kJ/kmol*K>
+            Cp_O2  = 29.376;    % molar specific heat  <kJ/kmol*K> 
             
             init.CpMat = [init.Cp_Fuel Cp_air Cp_H2O Cp_CO2 Cp_N2 Cp_O2 init.Cp_Fuel]';
             init.hfMat = [init.hf_Fuel hf_air hf_H2O hf_CO2 hf_N2 hf_O2 init.hf_Fuel]';
             
             % runs stoichiometric coefficients
-            % ---------------------- Stoichiometric Combustion ---------------------- % 
-            % Cw Hx Ny + (A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2
-            % 3.85 = D
-            % 4.85 = 2B
-            % 0.43 + A*2*0.71 = 2E
-            % A*0.21*2 = B + 2D
-            % ----------------------------------------------------------------------- % 
+% ---------------------- Stoichiometric Combustion ---------------------- % 
+% Cw Hx Ny + (A)(0.71N2 + 0.2102) -> (B)H2O + (D)CO2 + (E)N2
+% 3.85 = D
+% 4.85 = 2B
+% 0.43 + A*2*0.71 = 2E
+% A*0.21*2 = B + 2D
+% ----------------------------------------------------------------------- % 
             %    a     b  c  d
             A = [0     0 -1  0;...  % carbon
                  0    -2  0  0;...  % hydrogen
@@ -111,9 +111,9 @@ classdef Chemistry
             phi = f_yield/self.f_st;
 
             if(phi == 1)  
-            % ------------------------ Stoichiometric Combustion -------------------- % 
-            % C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
-            % ----------------------------------------------------------------------- %     
+% ------------------------ Stoichiometric Combustion -------------------- % 
+% C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
+% ----------------------------------------------------------------------- %     
                 air_coeff = self.mol_st(1)/phi;
                 %     b  d  e  f g
                 A = [ 0 -1  0  0 0;...  % carbon
@@ -132,9 +132,9 @@ classdef Chemistry
             %     gamma_nzl = 1.3845;             % gamma at nozzle throat
 
             elseif(phi < 1)                    
-            % ------------------------ Fuel lean Combustion ------------------------- % 
-            % C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
-            % ----------------------------------------------------------------------- % 
+% ------------------------ Fuel lean Combustion ------------------------- % 
+% C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
+% ----------------------------------------------------------------------- % 
                 air_coeff = self.mol_st(1)/phi;
                 %     b  d  e  f g
                 A = [ 0 -1  0  0 0;...  % carbon
@@ -149,11 +149,11 @@ classdef Chemistry
 
 
                 T_AFT = AFT(self, mol_mat, self.T_mat);    
-            else   
+            else
 
-            % ------------------------ Fuel Rich Combustion ------------------------- % 
-            % C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
-            % ----------------------------------------------------------------------- % 
+% ------------------------ Fuel Rich Combustion ------------------------- %
+% C3.85 H4.85 N0.43 + (a)(0.71N2 + 0.2102) -> (b)H2O + (d)CO2 + (e)N2 + (f)O2 + (g)C3.85 H4.85 N0.43
+% ----------------------------------------------------------------------- % 
                 air_coeff = self.mol_st(1)/phi;
                 %     b  d  e f  g
                 A = [ 0 -1  0 0 -3.85;...  % carbon

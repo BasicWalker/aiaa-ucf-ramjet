@@ -36,7 +36,7 @@ Status = (n/MaxSimSteps)*100;
 if Status > 100
     Status = 100;
 end
-fprintf('Running... %.2f%%\n',Status)                    % Running Simulator indicator
+fprintf('Running... %.2f%%\n',Status)               % Running Simulator indicator
 
 if GrainID(n) > GrainOD
     StopBurn = true;

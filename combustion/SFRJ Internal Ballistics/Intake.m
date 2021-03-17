@@ -2,14 +2,14 @@
 % File Name: Intake.m 
 % 
 % File Description: 
-% Intake design, oblique shock, normal shock calculation
+% Intake design, oblique shock, normal shock calculation.  This code
+% delivers intake flow properties to the combustion chamber inlet.
 % 
 % Name               Date      SCR  Description
 % -----------------  --------  ---  ------------------------------
 % Durlak & Aubertin  01/22/21  ???  Initial Creation 
 % ---------------------------------------------------------------------- %
-
-% solving mass flow rate      
+    
 % Station 1
 [~, Ti_To1(n), Pi_Po1(n), Rho_Rho_o(n), ~] = flowisentropic(gamma, flight_mach(n));
 T_o1(n) = (1/Ti_To1(n)) * Temp_atm(n);
@@ -56,9 +56,10 @@ P_4(n) = P4_Po4(n)*Po_4(n);
 Rho_4(n) = Rho_Rho_o4(n)*Rho_o_4(n);
 v_4(n) = mach_4(n)*sqrt(gamma*R*T_4(n));
 
-InltPres_stag(n) = Po_4(n);                     % Inlet stagnation pressure
-InltPres(n) = P_4(n);                           % Inlet static pressure
-InltRho(n) = Rho_4(n);                          % Inlet static density
-InltTemp(n) = T_4(n);                           % Inlet static temp
-InltVel(n) = v_4(n);                            % Inlet velocity
+% Pass variables to ballistic simulator variables
+InltPres_stag(n) = Po_4(n);                         % Inlet stagnation pressure
+InltPres(n) = P_4(n);                               % Inlet static pressure
+InltRho(n) = Rho_4(n);                              % Inlet static density
+InltTemp(n) = T_4(n);                               % Inlet static temp
+InltVel(n) = v_4(n);                                % Inlet velocity
 InltMach(n) = mach_4(n);                        % Inlet mach number

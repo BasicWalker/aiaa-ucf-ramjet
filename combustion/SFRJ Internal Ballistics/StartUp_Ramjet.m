@@ -42,7 +42,7 @@ R               = 287.05;                   % Universal Gas Constant for air
 %% User Defined Parameters 
 % --------------- Environmental User Defined Parameters --------------- %
 
-flight_mach(1)  = 2.0;                      % Booster max mach
+flight_mach(1)  = 1.8;                      % Booster max mach
 altitude(1)     = 1100;                     % Initial altitude for ramjet start (m)
 c_d             = 0.20;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
@@ -67,7 +67,6 @@ radius_combustor= InltD/2;                  % Radius of the combustor inlet (m)
 Area_combustor  = pi*radius_combustor^2;    % Area of the combustor inlet (m^2)
 def             = 17;                       % Deflection angle (deg)
 gamma           = 1.4;                      % Specific heat ratio (atm)
-% mach_i          = 2.1;                      % Initial Vehicle Mach 
 
 % ----------------------------- Nozzle ----------------------------- %
 
@@ -86,7 +85,6 @@ pressure_atm(1) = pressure_atm(1)*(1/Pa2kPa);                               % At
 Temp_atm(1)     = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);       % Atmosphereic Temperature (K)
 velocity(1)     = flight_mach(1)*sqrt(gamma_atm*R*Temp_atm(1));             % Atmosphereic Velocity (m/s)
 drag(1)         = c_d*0.5*Rho_atm(1)*velocity(1)^2*S;                       % Induced Drag (N)
-% Rho_atm(1)      = density(1);                                             % Density value for Intake Model - Clean up later
 Thrustdlvd(1)   = 400;                                                      % Fake first Thrust value 
 
 %% Main Code

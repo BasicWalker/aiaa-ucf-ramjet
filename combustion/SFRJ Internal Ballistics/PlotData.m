@@ -61,14 +61,6 @@ grid on
 % grid on
 % ylim([0 .05])
 
-% figure('Name','Pressure Plots')
-% plot(BurnTime, InltPres, BurnTime, PC, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
-% title('Pressure Plots')
-% xlabel('Time (s)')
-% ylabel('Pressure (kPa)')
-% legend('Inlet Pressure','Chamber Pressure - Legacy','Required Pressure - Choked Flow','Back Pressure', 'Chamber Pressure - Adiabatic Flame Temp')
-% grid on
-
 figure('Name','Pressure Plots')
 plot(BurnTime, InltPres_stag, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
 title('Pressure Plots')

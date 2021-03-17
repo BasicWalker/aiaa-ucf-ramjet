@@ -73,3 +73,9 @@ V_flowRate(n) = mach * V_soundNzlT(n);                              % Flow veloc
 Rho_static(n) = MdotTotal(n)/(V_flowRate(n) * NzlAT);               % Static density at nozzle throat (kg/m^3)
 Rho_stag(n) = (1/rho)*Rho_static(n);                                % Stagnation density at nozzle throat (kg/m^3)
 PC_TAFT(n) = Rho_stag(n)*R*T_stag(n) * (1/Pa2kPa);                  % Stagnation pressure = chamber pressure (kPa)
+
+% Fuel Mass Prop continued & O/F Ratio calculation
+OFRatio(n) = MOxdzrGen(n)/MFuelGen(n);                              % O/F Ratio
+MassGen(n) = MairGen(n) + MFuelGen(n);                              % Total mass generated (kg)
+MassFlow(n) = MassGen(n)/SFRJDt;                                    % Total mass flow (kg/s)
+AFRatio(n) = MairGen(n)/MFuelGen(n);                                % Fuel to air ratio

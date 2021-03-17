@@ -21,15 +21,7 @@ while StopBurn == 0
     Gas                                         % Call Gas Model
     BoundaryLayer                               % Call Boundary Layer Model
     Nozzle                                      % Call Nozzle Model
-
-    % Fuel Mass Prop continued & O/F Ratio calculation
-    OFRatio(n) = MOxdzrGen(n)/MFuelGen(n);      % O/F Ratio
-    MassGen(n) = MairGen(n) + MFuelGen(n);      % Total mass generated (kg)
-    MassFlow(n) = MassGen(n)/SFRJDt;            % Total mass flow (kg/s)
-    AFRatio(n) = MairGen(n)/MFuelGen(n);        % Fuel to air ratio 
-     
     Thrust                                      % Call Thrust Model
-    
    
     time = time + SFRJDt;                       % Step through simulation time
     n = n + 1;

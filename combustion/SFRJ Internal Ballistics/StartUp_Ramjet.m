@@ -80,13 +80,13 @@ chem = Chemistry();
 
 % ----------------- Trajectory Initial Conditions ------------------ %
                     
-density(1)      = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);    % Atmosphereic Density (kg/m^3)
+Rho_atm(1)      = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);    % Atmosphereic Density (kg/m^3)
 pressure_atm(1) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(1))/1e3);    % Atmosphereic Pressure (Pa)
 pressure_atm(1) = pressure_atm(1)*(1/Pa2kPa);                               % Atmosphereic Pressure (kPa)
 Temp_atm(1)     = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);       % Atmosphereic Temperature (K)
 velocity(1)     = flight_mach(1)*sqrt(gamma_atm*R*Temp_atm(1));             % Atmosphereic Velocity (m/s)
-drag(1)         = c_d*0.5*density(1)*velocity(1)^2*S;                       % Induced Drag (N)
-Rho_atm(1)      = density(1);                                               % Density value for Intake Model - Clean up later
+drag(1)         = c_d*0.5*Rho_atm(1)*velocity(1)^2*S;                       % Induced Drag (N)
+% Rho_atm(1)      = density(1);                                               % Density value for Intake Model - Clean up later
 Thrustdlvd(1)   = 400;                                                      % Fake first Thrust value 
 
 

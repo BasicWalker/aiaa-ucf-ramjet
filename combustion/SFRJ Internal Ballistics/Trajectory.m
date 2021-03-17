@@ -24,10 +24,9 @@ if (n > 1)
     
     velocity(n) = velocity(n-1) + acceleration(n-1)*(SFRJDt);                               % Velocity
     altitude(n) = altitude(n-1) + velocity(n-1)*SFRJDt + 0.5*acceleration(n-1)*SFRJDt^2;    % Altitude
-    density(n) = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(n))/1e3);                     % Interpolated Lookup Table
-    pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(n))/1e3);                % Interpolated Lookup Table
-    Temp_atm(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(n))/1e3);                       % Interpolated Lookup Table
-    Rho_atm(n) = density(n);                                                                % Assign for Intake Model - Clean up later
+    Rho_atm(n) = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(n))/1e3);                     % Interpolated Lookup Table, atm density
+    pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(n))/1e3);                % Interpolated Lookup Table, atm pressure
+    Temp_atm(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(n))/1e3);                       % Interpolated Lookup Table, atm temp
     pressure_atm(n) = pressure_atm(n)*(1/Pa2kPa);                                           % Convert to Kpa
     flight_mach(n) = velocity(n)/sqrt(gamma_atm*R*Temp_atm(n));                             % Vehicle Mach
     drag(n) = c_d*0.5*Rho_atm(n)*velocity(n)^2*S;                                           % Vehicle drag force

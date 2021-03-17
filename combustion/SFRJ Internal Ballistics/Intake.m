@@ -1,17 +1,13 @@
-% --------- Senior Design - Ramjet Powered Vehicle --------- %
-% Program Name:  Intake
-% 
-% Program Description: 
-%
-% 
-% File Name: NozzleCalculation.m
+% ------ SFRJ Internal Ballistic Simulator / UCF CAPSTONE PROJECT ------ %
+% File Name: Intake.m 
 % 
 % File Description: 
+% Intake design, oblique shock, normal shock calculation
 % 
-% Name                               Date      Description
-% ----------------------------      --------  -------------------------
-% Jared Durlak & Matt Aubertin      01/22/21  Initial Creation 
-% --------------------------------------------------------------------- %
+% Name               Date      SCR  Description
+% -----------------  --------  ---  ------------------------------
+% Durlak & Aubertin  01/22/21  ???  Initial Creation 
+% ---------------------------------------------------------------------- %
 
 % solving mass flow rate      
 % Station 1

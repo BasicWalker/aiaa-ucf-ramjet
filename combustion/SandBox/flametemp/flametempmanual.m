@@ -27,7 +27,7 @@
     mwn2 = 28.013;
 
     
-    for(reacttemp = 1000:100:4000)
+    for(reacttemp = 400:100:1000)
         
         fprintf("------------REACTANT TEMPERATURE = %d K---------------", reacttemp);
         %---HEAT OF COMBUSTION CALCULATION---%
@@ -41,6 +41,7 @@
         %Total moles of products
         %Mole fractions for each molecule
         
+        cpair = 29.67 
         
         %HEAT OF FORMATION FOR EACH MOLECULE%
 
@@ -53,6 +54,7 @@
         hfh2o = -241820; %kJ/kmol
         hfabs = 62630; %kJ/kmol
         
+        
         tstp = 273.15; %K
         
         %Molar Cp of molecules needed (CP VALUES CHANGE WITH TEMPERATURE,WILL BE INCORPORATED AT A LATER TIME)
@@ -60,27 +62,26 @@
         %Mass Cp values (kJ/kg*K)
         %Other values taken at 300K
         cpabs = 1.423; %Average value given, won't change with temperature
-        cpair = 1.006;
-        cph2o = 1.864;
-        cpco2 = .846;
-        cpn2 = 1.04;
         
         %Molar Cp values
         mcpabs = cpabs*mwabs
-        mcpair = cpair*mwair
-        mcph2o = cph2o*mwh2o
-        mcpco2 = cpco2*mwco2
-        mcpn2 = cpn2*mwn2
+        mcpair = cpair
+        
+        %Molar CP must be calculated for high temperatures
+        x = reacttemp/100;
+        mcph2o = 143.05 - (183.54 * (x^0.25)) + (82.751 * (x^ 0.5)) - (3.6989 * x)
+        mcpco2 = -3.7357 + (30.529 * (x^0.5)) - (4.1034 * x) + (.024198 * (x^2))
+        mcpn2 = 39.06 - (512.79 * (x^(-1.5))) + (1072.7 * (x^(-2))) - (820.4 * (x^(-3)))
         
         %Mole Fractions
-        mfabs = molf/molr;
-        mfair = molair/molr;
-        mfh2o = molh2o/molp;
-        mfco2 = molco2/molp;
-        mfn2 = moln2/molp;
+        mfabs = molf/molr
+        mfair = molair/molr
+        mfh2o = molh2o/molp
+        mfco2 = molco2/molp
+        mfn2 = moln2/molp
         
         %Average Molar Cp values
-        mcpr = (mfabs * mcpabs) + (mfair * mcpair); %Reactants
+        mcpr = (mfabs * mcpabs)  + (mfair * mcpair); %Reactants
         mcpp = (mfh2o * mcph2o) + (mfco2 * mcpco2) + (mfn2 * mcpn2)
         
         %HEAT OF COMBUSTION*
@@ -108,9 +109,7 @@
         
         fprintf("Heat of Combustion: %f kJ/kg\n", hoc)
         
-        
-        
-        
+       
         %---ADIABATIC FLAME TEMPERATURE---%
        
         
@@ -119,7 +118,7 @@
         aft = reacttemp + hoc/((molh2o * mcph2o) + (molco2 * mcpco2) + (moln2 * mcpn2));
         
         fprintf("ADIABATIC FLAME TEMP = %f K\n\n\n\n", aft);
-        
+       
         
         %---PLOTS---%
         
@@ -129,15 +128,88 @@
         xlabel('Reactant Temperature (K)');
         ylabel('Adiabatic Flame Temperature(K)');
         
+%         figure(2)
+%         plot(reacttemp, mcph2o, '*'); hold on
+%         grid on;
+%         xlabel('Temperature (K)');
+%         ylabel('Molar Cp of H2O (kJ/kmol * K)');
+%         
+%         figure(3)
+%         plot(reacttemp, mcpco2, '*'); hold on
+%         grid on;
+%         xlabel('Temperature (K)');
+%         ylabel('Molar Cp of CO2 (kJ/kmol * K)');
+%         
+%         figure(4)
+%         plot(reacttemp, mcpn2, '*'); hold on
+%         grid on;
+%         xlabel('Temperature (K)');
+%         ylabel('Molar Cp of N2 (kJ/kmol * K)');
+               
     end
-        
-        
-        
-        
-        
     
-   
-     %%--------HTPB--------%%
+for (temp = 2500:100:3500)
+    
+     cpabs = 1.423; %Average value given, won't change with temperature
 
-     %Heat of formation: 23990 kJ/kmol
+    %Molar Cp values
+    mcpabs = cpabs*mwabs
+    mcpair = cpair
+
+    %Molar CP must be calculated for high temperatures
+    x = temp/100;
+    mcph2o = 143.05 - (183.54 * (x^0.25)) + (82.751 * (x^ 0.5)) - (3.6989 * x)
+    mcpco2 = -3.7357 + (30.529 * (x^0.5)) - (4.1034 * x) + (.024198 * (x^2))
+    mcpn2 = 39.06 - (512.79 * (x^(-1.5))) + (1072.7 * (x^(-2))) - (820.4 * (x^(-3)))
+
+    %Mole Fractions
+    mfabs = molf/molr;
+    mfair = molair/molr;
+    mfh2o = molh2o/molp;
+    mfco2 = molco2/molp;
+    mfn2 = moln2/molp;
+
+    %Average Molar Cp values
+    mcpr = (mfabs * mcpabs)  + (mfair * mcpair); %Reactants
+    mcpp = (mfh2o * mcph2o) + (mfco2 * mcpco2) + (mfn2 * mcpn2);
+    
+
+    %---IDEAL GAS VALUES---%
+
+    Ru = 8.314; %kJ/kmol * K
+    R_abs = Ru/mwabs;
+    R_air = Ru/mwair;
+    R_h2o = Ru/mwh2o;
+    R_co2 = Ru/mwco2;
+    R_n2 = Ru/mwn2;
+
+    Cv_abs = mcpabs - R_abs;
+    Cv_air = mcpair - R_air;
+    Cv_h2o = mcpair - R_h2o;
+    Cv_co2 = mcpco2 - R_co2;
+    Cv_n2 = mcpn2 - R_n2;
+
+    mcvp = (mfh2o * Cv_h2o) + (mfco2 * Cv_co2) + (mfn2 * Cv_n2);
+
+    k = mcpp/mcvp;
+
+    figure(5)
+    plot(temp, mcpp, '*'); hold on
+    grid on;
+    xlabel('Product Temperature (K)');
+    ylabel('Average Molar Cp of Products');
+
+    figure(6)
+    plot(temp, mcvp, '*'); hold on
+    grid on;
+    xlabel('Product Temperature (K)');
+    ylabel('Average Molar Cv of Products');
+
+    figure(7)
+    plot(temp, k, '*'); hold on
+    grid on;
+    xlabel('Temperature (K)');
+    ylabel('Specific Heat Ratio of Products');
+    
+end
  

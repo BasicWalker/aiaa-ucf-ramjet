@@ -32,15 +32,15 @@ if (n > 1)
     altitude(n) = altitude(n-1) + velocity(n-1)*SFRJDt + 0.5*acceleration(n-1)*SFRJDt^2;
 end
 
-% Interpolated Lookup Tables - Atm values
-pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(n))/1e3);
-pressure_atm(n) = pressure_atm(n)*(1/Pa2kPa);
-Temp_atm(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(n))/1e3);
-Rho_atm(n) = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(n))/1e3);
+% % Interpolated Lookup Tables - Atm values
+% pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(n))/1e3);
+% pressure_atm(n) = pressure_atm(n)*(1/Pa2kPa);
+% Temp_atm(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(n))/1e3);
+% Rho_atm(n) = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(n))/1e3);
 
-Intake                                                              % Call Intake Model
+% Intake                                                              % Call Intake Model
 
-InltMassFlw(n) = m_dot(n);
+InltMassFlw(n) = m_dot(n);                                          % Mdot from Intake Model
 
 % Calculate air mass properties
 MairGen(n) = InltMassFlw(n)*SFRJDt;                                 % Mass of air generated (kg)

@@ -16,6 +16,8 @@ while StopBurn == 0
     
     RegressionRate                              % Call Regression Rate Model
     GrainGeometry                               % Call Instantaneous Grain Geometry Model
+    Trajectory                                  % Call Trajectory Model
+    Intake                                      % Call Intake Model
     Gas                                         % Call Gas Model
     BoundaryLayer                               % Call Boundary Layer Model
     Nozzle                                      % Call Nozzle Model
@@ -27,7 +29,7 @@ while StopBurn == 0
     AFRatio(n) = MairGen(n)/MFuelGen(n);        % Fuel to air ratio 
      
     Thrust                                      % Call Thrust Model
-    Trajectory                                  % Call Trajectory Model
+    
    
     time = time + SFRJDt;                       % Step through simulation time
     n = n + 1;

@@ -42,9 +42,9 @@ R               = 287.05;                   % Universal Gas Constant for air
 %% User Defined Parameters 
 % --------------- Environmental User Defined Parameters --------------- %
 
-flight_mach(1)  = 2.1;                      % Booster max mach
+flight_mach(1)  = 2.0;                      % Booster max mach
 altitude(1)     = 1100;                     % Initial altitude for ramjet start (m)
-c_d             = 0.35;                     % Drag coefficient
+c_d             = 0.20;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
 gamma_atm       = 1.4;                      % Specific heat ratio
 R               = 287.05;                   % Ideal gas constant (J/kg*K)
@@ -80,12 +80,15 @@ chem = Chemistry();
 
 % ----------------- Trajectory Initial Conditions ------------------ %
                     
-density(1) = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);         % Atmosphereic Density (kg/m^3)
+density(1)      = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);    % Atmosphereic Density (kg/m^3)
 pressure_atm(1) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(1))/1e3);    % Atmosphereic Pressure (Pa)
 pressure_atm(1) = pressure_atm(1)*(1/Pa2kPa);                               % Atmosphereic Pressure (kPa)
-temperature(1) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);        % Atmosphereic Temperature (K)
-velocity(1) = flight_mach(1)*sqrt(gamma_atm*R*temperature(1));              % Atmosphereic Velocity (m/s)
-drag(1) = c_d*0.5*density(1)*velocity(1)^2*S;                               % Induced Drag (N)
+Temp_atm(1)     = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);       % Atmosphereic Temperature (K)
+velocity(1)     = flight_mach(1)*sqrt(gamma_atm*R*Temp_atm(1));             % Atmosphereic Velocity (m/s)
+drag(1)         = c_d*0.5*density(1)*velocity(1)^2*S;                       % Induced Drag (N)
+Rho_atm(1)      = density(1);                                               % Density value for Intake Model - Clean up later
+Thrustdlvd(1)   = 400;                                                      % Fake first Thrust value 
+
 
 
 %% Main Code

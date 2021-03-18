@@ -18,7 +18,7 @@ while StopBurn == 0
     GrainGeometry                               % Call Instantaneous Grain Geometry Model
     Trajectory                                  % Call Trajectory Model
     Intake                                      % Call Intake Model
-    Gas                                         % Call Gas Model
+    Gas                                         % Call Gas Model (And Chemistry Model)
     BoundaryLayer                               % Call Boundary Layer Model
     Nozzle                                      % Call Nozzle Model
     Thrust                                      % Call Thrust Model

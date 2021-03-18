@@ -56,10 +56,10 @@ P_4(n) = P4_Po4(n)*Po_4(n);
 Rho_4(n) = Rho_Rho_o4(n)*Rho_o_4(n);
 v_4(n) = mach_4(n)*sqrt(gamma*R*T_4(n));
 
-% Pass variables to ballistic simulator variables
+% Pass variables to ballistic simulator
 InltPres_stag(n) = Po_4(n);                         % Inlet stagnation pressure
 InltPres(n) = P_4(n);                               % Inlet static pressure
 InltRho(n) = Rho_4(n);                              % Inlet static density
 InltTemp(n) = T_4(n);                               % Inlet static temp
 InltVel(n) = v_4(n);                                % Inlet velocity
-InltMach(n) = mach_4(n);                        % Inlet mach number
+InltMach(n) = mach_4(n);                            % Inlet mach number

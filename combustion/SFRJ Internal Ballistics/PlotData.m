@@ -9,6 +9,7 @@
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  001  Updated plots for SCR 001
 % Ethan Sherlock  02/14/21  005  1DOF trajectory update
+% Ethan Shelock   03/12/21  002  Updated plots for SCR 002
 % ---------------------------------------------------------------------- %
 Thrustdlvd(n-1)     = 0.0;
 PC(n-1)             = 0.0;
@@ -26,7 +27,6 @@ title('O/F Ratio')
 xlabel('Time (s)')
 ylabel('')
 grid on
-% ylim([0 12])
 
 % figure('Name','A/F Ratio')
 % hold on
@@ -102,7 +102,7 @@ title('Equivalence Ratio vs Time')
 xlabel('Time (s)')
 ylabel('Equivalence Ratio (phi)')
 grid on
-ylim([0 11])
+ylim([0 16])
 
 figure('Name','Adiabatic Flame Temperature')
 plot(BurnTime,T_stag)
@@ -122,8 +122,8 @@ fprintf('PC From TAFT:              %.2f  (kPa)\n',mean(PC_TAFT))
 fprintf('Initial Step Height:       %.2f    (in) \n', StepHeight(1)*In2Mtr)
 fprintf('Average Inlet Velocity:    %.2f  (m/s)\n', mean(InltVel))
 fprintf('Average Inlet Mach:        %.2f  \n', mean(InltMach))
-fprintf('Average O/F Ratio:         %.2f      \n',mean(OFRatio))
-fprintf('Average Equivalence Ratio: %.2f  \n',mean(phi))
+fprintf('Average O/F Ratio:         %.2f  \n',mean(OFRatio))
+fprintf('Average Equivalence Ratio: %.2f  \n',mean(phi_eqv))
 fprintf('--------------------------------------------\n')
 
 

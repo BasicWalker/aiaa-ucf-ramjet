@@ -9,36 +9,15 @@
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  001  Chamber Pressure Calculation Update
+% Ethan Sherlock  03/12/21  002  Added Chemistry Model 
 % ---------------------------------------------------------------------- %
 
-% Set Inlet velocity and pressure
-% InltVel(n) = InltVel(1);
-% InltPres(n) = InltPres(1);
-% InltPres_stag(n) = InltPres_stag(1);
-
-f(n) = MFuelGen(n) / SFRJDt;        % 
+f(n) = MFuelGen(n) / SFRJDt;        % Mass Flow Rate of Fuel
 
 % Chamber pressure (PC) based on Austins reverse nozzle area calculations
 % PC(n) = (3/(121*(NzlAT^2))) * ((20*sqrt(5))*sqrt(121*(NzlAT^2)*(InltArea^2)*InltRho(1)*InltPres(n)...
 %       - 33*NzlAT*f(n)*(InltArea^2)*InltRho(1) + 4500*(InltArea^4)*InltRho(1)^2) ...
 %       + 11*NzlAT*f(n) - 3000*(InltArea^2)*InltRho(1));
-   
-
-% Calculate air velocity after sudden expansion inside the chamber 
-% AirVel(n) = InltVel(n) * (InltArea/PortArea(n));                    % Velocity of air 
-
-% Keep track of altitude
-if (n > 1)
-    altitude(n) = altitude(n-1) + velocity(n-1)*SFRJDt + 0.5*acceleration(n-1)*SFRJDt^2;
-end
-
-% % Interpolated Lookup Tables - Atm values
-% pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(n))/1e3);
-% pressure_atm(n) = pressure_atm(n)*(1/Pa2kPa);
-% Temp_atm(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(n))/1e3);
-% Rho_atm(n) = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(n))/1e3);
-
-% Intake                                                              % Call Intake Model
 
 InltMassFlw(n) = m_dot(n);                                          % Mdot from Intake Model
 
@@ -62,8 +41,8 @@ phi_eqv(n) = phi;
 % Required chamber pressure for exit Mach = 2 
 [mach, T, P, rho, area] = flowisentropic(gamma_nzlT(n), 1.7 ,'sup');
 PCreq(n) = (1/P)*pressure_atm(n);                                   % Calculates Stag Pres based on Pressure ratio, assumes Pstag = PC
-Temp_exit(n) = T*T_AFT;
-Mach_exit(n) = mach;
+Temp_exit(n) = T*T_AFT;                                             % Temperature at exit plane
+Mach_exit(n) = mach;                                                % Mach at exit plane
 
 % Chamber Pressure based on adiabatic flame temp
 [mach, T, P, rho, area] = flowisentropic(1.321, 1 ,'mach');         % Isentropic flow conditions at nozzle throat

@@ -30,16 +30,15 @@ MdotTotal(n) = MdotAir(n) + MdotFuel(n);                            % Total mass
 f_yield(n) = (MFuelGen(n)/MairGen(n));                              % fuel to air ratio 
 
 % --------------------- Chemistry Model --------------------- %
-% [phi,gamma_nzl, T_AFT] = Chemistry(f_yield(n));                   % Call Chemistry Model
-[phi, T_AFT] = chem.phiSolver(f_yield(n),475);                      % need to add T_air before combustion chamber 475
+[phi, T_AFT] = chem.phiSolver(f_yield(n),475);                      % Call Chemistry Model, need to add T_air before combustion chamber 475
 T_stag(n) = T_AFT;                                                  % Stagnation temp in nozzle
-gamma_nzl = 1.3845;  % temp
+gamma_nzl = 1.3845;                                                 % Temporary
 gamma_nzlT(n) = gamma_nzl;                                          % Gamma at the nozzle throat
-phi_eqv(n) = phi;
+phi_eqv(n) = phi;                                                   % Grab phi value
 % ----------------------------------------------------------- %
 
 % Required chamber pressure for exit Mach = 2 
-[mach, T, P, rho, area] = flowisentropic(gamma_nzlT(n), 1.7 ,'sup');
+[mach, T, P, rho, area] = flowisentropic(gamma_nzlT(n), 1.7 ,'sup');% Isentropic Relations
 PCreq(n) = (1/P)*pressure_atm(n);                                   % Calculates Stag Pres based on Pressure ratio, assumes Pstag = PC
 Temp_exit(n) = T*T_AFT;                                             % Temperature at exit plane
 Mach_exit(n) = mach;                                                % Mach at exit plane

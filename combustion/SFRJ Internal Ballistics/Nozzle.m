@@ -2,7 +2,7 @@
 % File Name: Nozzle.m 
 % 
 % File Description: 
-% Numerical solver to design an optimal nozzle geometry
+% Numerical solver to design the optimal nozzle geometry
 % 
 % Name            Date      SCR  Description
 % --------------  --------  ---  ------------------------------

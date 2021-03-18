@@ -9,7 +9,7 @@
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  001  Updated plots for SCR 001
 % Ethan Sherlock  02/14/21  005  1DOF trajectory update
-% Ethan Shelock   03/12/21  002  Updated plots for SCR 002
+% Ethan Shelock   03/12/21  002  Updated plots for Chem Model
 % ---------------------------------------------------------------------- %
 Thrustdlvd(n-1)     = 0.0;
 PC(n-1)             = 0.0;
@@ -110,7 +110,6 @@ title('Adiabatic Flame Temperature vs Time')
 xlabel('Time (s)')
 ylabel('Temperature <k>')
 grid on
-% ylim([0 8])
 
 fprintf('\n------------ Simulation Results ------------\n')
 fprintf('Burn Time:                 %.2f   (s)\n', BurnTime(n-1))

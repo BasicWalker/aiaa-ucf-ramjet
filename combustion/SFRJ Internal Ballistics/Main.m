@@ -9,6 +9,7 @@
 % Ethan Sherlock  01/22/21  000  Initial creation 
 % Ethan Sherlock  02/14/21  001  Chamber pressure calculation update
 % Ethan Sherlock  02/14/21  005  1DOF trajectory update
+% Ethan Sherlock  03/17/21  ---  Code Clean Up
 % ---------------------------------------------------------------------- %
 
 while StopBurn == 0
@@ -26,4 +27,4 @@ while StopBurn == 0
     time = time + SFRJDt;                       % Step through simulation time
     n = n + 1;
 end
-PlotData
+PlotData                                        % Plot Simulation Results

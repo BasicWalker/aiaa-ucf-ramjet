@@ -15,6 +15,7 @@
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  005  Add 1DOF Trajectory Initialization
+% Ethan Sherlock  03/12/21  ---  Add Intake Initialization  
 % 
 % ---------------------------------------------------------------------- %
 close all; clear; clc;

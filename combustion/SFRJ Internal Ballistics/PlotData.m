@@ -111,7 +111,14 @@ xlabel('Time (s)')
 ylabel('Temperature <k>')
 grid on
 
-fprintf('\n------------ Simulation Results ------------\n')
+if (mean(InltMach) > 0.2)
+    fprintf(2,'\nWARNING: Inlet Mach number is too high.\n')
+end
+if (mean(phi_eqv) > 3.0)
+    fprintf(2,'WARNING: Equivalence Ratio is too high.\n')
+end
+
+fprintf('------------ Simulation Results ------------\n')
 fprintf('Burn Time:                 %.2f   (s)\n', BurnTime(n-1))
 fprintf('Average Thrust:            %.2f  (N)\n', mean(Thrustdlvd))
 fprintf('Average Drag Force:        %.2f  (N)\n',mean(drag))

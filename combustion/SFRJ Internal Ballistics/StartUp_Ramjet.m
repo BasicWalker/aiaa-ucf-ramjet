@@ -15,6 +15,7 @@
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  005  Add 1DOF Trajectory Initialization
+% Ethan Sherlock  03/12/21  ---  Add Intake Initialization  
 % 
 % ---------------------------------------------------------------------- %
 close all; clear; clc;
@@ -42,18 +43,18 @@ R               = 287.05;                   % Universal Gas Constant for air
 %% User Defined Parameters 
 % --------------- Environmental User Defined Parameters --------------- %
 
-flight_mach(1)  = 1.2;                      % Booster max mach
+flight_mach(1)  = 1.8;                      % Booster max mach
 altitude(1)     = 1100;                     % Initial altitude for ramjet start (m)
-c_d             = 0.35;                     % Drag coefficient
+c_d             = 0.20;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
 gamma_atm       = 1.4;                      % Specific heat ratio
 R               = 287.05;                   % Ideal gas constant (J/kg*K)
-dry_mass        = 4.536;                    % Mass of ramjet without fuelgrain (kg)
+dry_mass        = 6.80389;                  % Mass of ramjet without fuelgrain (kg)
 
 % --------------- Fuel Grain User Defined Parameters --------------- %
 
 GrainOD         =  2.75 /In2Mtr;            % Grain OD (m)
-GrainID(1)      =  1.00 /In2Mtr;            % Grain ID (m)
+GrainID(1)      =  1.25 /In2Mtr;            % Grain ID (m)
 GrainL          = 15.00 /In2Mtr;            % Grain Length (m)
 FuelRho         = 1020;                     % Grain Density (kg/m^3)
 
@@ -61,14 +62,12 @@ FuelRho         = 1020;                     % Grain Density (kg/m^3)
 
 InltD           = 0.85 / In2Mtr;            % Diameter of inlet (m)
 InltArea        = pi*InltD^2*(1/4);         % Area of inlet (m)
-InltPres(1)     = 6.1493 * Bar2kPa;         % Pressure (static) of inlet (kPa)
-InltRho         = 4.5122;                   % Density of air at the inlet (kg/m^3)
-InltTemp        = 250.05 + C2K;             % Temp of air at the inlet (K)
 gamma_Inlt      = 1.3845;                   % Specific heat ratio of air 
-InltSpeedSnd    = sqrt(gamma_Inlt*R*InltTemp);% Speed of Sound at inlet (m/s)
-InltMach        = 0.2;                      % Mach number at the inlet
-InltVel(1)      = InltMach*InltSpeedSnd;    % Velocity of air at the inlet
-InltMassFlw     = 0.75; %InltRho*InltVel*InltArea; % Mass flow rate of air at the inlet
+Area_3          = 2.5459e-04;               % Area of throat (m^2)
+radius_combustor= InltD/2;                  % Radius of the combustor inlet (m)
+Area_combustor  = pi*radius_combustor^2;    % Area of the combustor inlet (m^2)
+def             = 17;                       % Deflection angle (deg)
+gamma           = 1.4;                      % Specific heat ratio (atm)
 
 % ----------------------------- Nozzle ----------------------------- %
 
@@ -77,18 +76,17 @@ NzlAT           = pi*(NzlThrtDia/2)^2;      % Throat area (m^2)
 
 % --------------- Chemistry User Defined Parameters ---------------- %
 
-Phi             = 1.0;                      % Equivalence ratio
 chem = Chemistry();
 
 % ----------------- Trajectory Initial Conditions ------------------ %
                     
-density(1) = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);         % Atmosphereic Density (kg/m^3)
+Rho_atm(1)      = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);    % Atmosphereic Density (kg/m^3)
 pressure_atm(1) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(1))/1e3);    % Atmosphereic Pressure (Pa)
 pressure_atm(1) = pressure_atm(1)*(1/Pa2kPa);                               % Atmosphereic Pressure (kPa)
-temperature(1) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);        % Atmosphereic Temperature (K)
-velocity(1) = flight_mach(1)*sqrt(gamma_atm*R*temperature(1));              % Atmosphereic Velocity (m/s)
-drag(1) = c_d*0.5*density(1)*velocity(1)^2*S;                               % Induced Drag (N)
-
+Temp_atm(1)     = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);       % Atmosphereic Temperature (K)
+velocity(1)     = flight_mach(1)*sqrt(gamma_atm*R*Temp_atm(1));             % Atmosphereic Velocity (m/s)
+drag(1)         = c_d*0.5*Rho_atm(1)*velocity(1)^2*S;                       % Induced Drag (N)
+Thrustdlvd(1)   = 400;                                                      % Fake First Thrust Value 
 
 %% Main Code
 Main

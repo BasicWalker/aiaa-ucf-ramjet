@@ -9,6 +9,7 @@
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % Ethan Sherlock  02/14/21  001  Updated plots for SCR 001
 % Ethan Sherlock  02/14/21  005  1DOF trajectory update
+% Ethan Shelock   03/12/21  002  Updated plots for Chem Model
 % ---------------------------------------------------------------------- %
 Thrustdlvd(n-1)     = 0.0;
 PC(n-1)             = 0.0;
@@ -26,7 +27,6 @@ title('O/F Ratio')
 xlabel('Time (s)')
 ylabel('')
 grid on
-% ylim([0 12])
 
 % figure('Name','A/F Ratio')
 % hold on
@@ -61,16 +61,8 @@ grid on
 % grid on
 % ylim([0 .05])
 
-% figure('Name','Pressure Plots')
-% plot(BurnTime, InltPres, BurnTime, PC, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
-% title('Pressure Plots')
-% xlabel('Time (s)')
-% ylabel('Pressure (kPa)')
-% legend('Inlet Pressure','Chamber Pressure - Legacy','Required Pressure - Choked Flow','Back Pressure', 'Chamber Pressure - Adiabatic Flame Temp')
-% grid on
-
 figure('Name','Pressure Plots')
-plot(BurnTime, InltPres, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
+plot(BurnTime, InltPres_stag, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime, PC_TAFT)
 title('Pressure Plots')
 xlabel('Time (s)')
 ylabel('Pressure (kPa)')
@@ -110,7 +102,7 @@ title('Equivalence Ratio vs Time')
 xlabel('Time (s)')
 ylabel('Equivalence Ratio (phi)')
 grid on
-ylim([0 8])
+ylim([0 16])
 
 figure('Name','Adiabatic Flame Temperature')
 plot(BurnTime,T_stag)
@@ -118,15 +110,26 @@ title('Adiabatic Flame Temperature vs Time')
 xlabel('Time (s)')
 ylabel('Temperature <k>')
 grid on
-% ylim([0 8])
 
-fprintf('\n------------ Simulation Results ------------\n')
-fprintf('Burn Time:             %.2f   (s)\n', BurnTime(n-1))
-fprintf('Average Thrust:        %.2f  (N)\n', mean(Thrustdlvd))
-fprintf('Total Impulse:         %.2f (Ns)\n', TotallImp(n-1))
-fprintf('Inlet Velocity:        %.2f   (m/s)\n', InltVel(n-1))
-fprintf('Inlet Mass Flow Rate:  %.3f   (kg/s)\n', InltMassFlw)
-fprintf('PC From TAFT:          %.2f  (kPa)\n',mean(PC_TAFT))
-fprintf('Initial Step Height:   %.2f    (in) \n', StepHeight(1)*In2Mtr)
-fprintf('Average O/F Ratio:     %.2f      \n',mean(OFRatio))
+if (mean(InltMach) > 0.2)
+    fprintf(2,'\nWARNING: Inlet Mach number is too high.\n')
+end
+if (mean(phi_eqv) > 3.0)
+    fprintf(2,'WARNING: Equivalence Ratio is too high.\n')
+end
+
+fprintf('------------ Simulation Results ------------\n')
+fprintf('Burn Time:                 %.2f   (s)\n', BurnTime(n-1))
+fprintf('Average Thrust:            %.2f  (N)\n', mean(Thrustdlvd))
+fprintf('Average Drag Force:        %.2f  (N)\n',mean(drag))
+fprintf('Total Impulse:             %.2f (Ns)\n', TotallImp(n-1))
+fprintf('Inlet Mass Flow Rate:      %.3f   (kg/s)\n', mean(InltMassFlw))
+fprintf('PC From TAFT:              %.2f  (kPa)\n',mean(PC_TAFT))
+fprintf('Initial Step Height:       %.2f    (in) \n', StepHeight(1)*In2Mtr)
+fprintf('Average Inlet Velocity:    %.2f  (m/s)\n', mean(InltVel))
+fprintf('Average Inlet Mach:        %.2f  \n', mean(InltMach))
+fprintf('Average O/F Ratio:         %.2f  \n',mean(OFRatio))
+fprintf('Average Equivalence Ratio: %.2f  \n',mean(phi_eqv))
 fprintf('--------------------------------------------\n')
+
+

@@ -9,6 +9,7 @@
 % Ethan Sherlock  01/22/21  000  Initial creation 
 % Ethan Sherlock  02/14/21  001  Chamber pressure calculation update
 % Ethan Sherlock  02/14/21  005  1DOF trajectory update
+% Ethan Sherlock  03/17/21  ---  Code Clean Up
 % ---------------------------------------------------------------------- %
 
 while StopBurn == 0
@@ -16,38 +17,14 @@ while StopBurn == 0
     
     RegressionRate                              % Call Regression Rate Model
     GrainGeometry                               % Call Instantaneous Grain Geometry Model
-    
-    
-    
-
-    Gas                                         % Call Gas Model
-
+    Trajectory                                  % Call Trajectory Model
+    Intake                                      % Call Intake Model
+    Gas                                         % Call Gas Model (And Chemistry Model)
     BoundaryLayer                               % Call Boundary Layer Model
     Nozzle                                      % Call Nozzle Model
-
-    % Fuel Mass Prop continued & O/F Ratio calculation
-    OFRatio(n) = MOxdzrGen(n)/MFuelGen(n);      % O/F Ratio
-    MassGen(n) = MairGen(n) + MFuelGen(n);      % Total mass generated (kg)
-    MassFlow(n) = MassGen(n)/SFRJDt;            % Total mass flow (kg/s)
-    AFRatio(n) = MairGen(n)/MFuelGen(n);        % Fuel to air ratio 
-    
-    % Print O/F Ratio warning
-    if OFRatio(n) > 10
-        fprintf('WARNING: O/F Ratio too high \n')
-    end
-    
-    if OFRatio(n) < 3
-        fprintf('WARNING: O/F Ratio too low \n')
-    end
-     
-    fprintf('Running... \n')                    % Running Simulator indicator
-    
     Thrust                                      % Call Thrust Model
-    
-    Trajectory                                  % Call Trajectory Model
    
-    % Step through simulation time
-    time = time + SFRJDt;
+    time = time + SFRJDt;                       % Step through simulation time
     n = n + 1;
 end
-PlotData
+PlotData                                        % Plot Simulation Results

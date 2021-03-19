@@ -2,7 +2,7 @@
 % File Name: Nozzle.m 
 % 
 % File Description: 
-% Nozzle model, methods of characteristics calculation
+% Numerical solver to design the optimal nozzle geometry
 % 
 % Name            Date      SCR  Description
 % --------------  --------  ---  ------------------------------

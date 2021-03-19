@@ -9,27 +9,20 @@
 % Ethan Sherlock  01/22/21  000  Initial Creation 
 % ---------------------------------------------------------------------- %
 
-% Initialize Grain Geometry Model
-PortArea(1) = pi*(GrainID(1)^2)*(1/4);              % Fuel Port Area
-FuelCS(1) = pi*(GrainOD^2)*(1/4) - PortArea(1);     % Fuel Grain Crossectional Area
-FuelVol(1) = FuelCS(1) * GrainL;                    % Fuel Grain Volume
-FuelSA(1) = GrainID(1)* pi * GrainL;                % Fuel Grain Surface Area
-
-% After Initialization 
 if n > 1
-    GrainID(n) = GrainID(n-1) + 2 * RgrsPerStp;     % Fuel Grain Inner Diameter
-    PortArea(n) = pi*(GrainID(n)^2)*(1/4);          % Fuel Port Area
-    FuelCS(n) = pi*(GrainOD^2)*(1/4) - PortArea(n); % Fuel Grain Crossectional Area
-    FuelVol(n) = FuelCS(n) * GrainL;                % Fuel Grain Volume
-    FuelSA(n) = GrainID(n)* pi * GrainL;            % Fuel Grain Surface Area
+    GrainID(n) = GrainID(n-1) + 2 * RgrsPerStp;     % Fuel Grain Inner Diameter (m)
+    PortArea(n) = pi*(GrainID(n)^2)*(1/4);          % Fuel Port Area (m^2)
+    FuelCS(n) = pi*(GrainOD^2)*(1/4) - PortArea(n); % Fuel Grain Crossectional Area (m^2)
+    FuelVol(n) = FuelCS(n) * GrainL;                % Fuel Grain Volume (m^3)
+    FuelSA(n) = GrainID(n)* pi * GrainL;            % Fuel Grain Surface Area (m^2)
 end
 
 StepHeight(n) = (GrainID(n) - InltD)/2;             % Rearward Step Height
 
 % Fuel Mass Properties
-MFuelGen(n) = RgrsPerStp*FuelRho*FuelSA(n);         % Fuel mass generated every time step
-MdotFuel(n) = MFuelGen(n)/SFRJDt;                   % Fuel mass flow rate
-FuelMass(n) = FuelRho*FuelVol(n);                   % Fuel mass 
+MFuelGen(n) = RgrsPerStp*FuelRho*FuelSA(n);         % Fuel mass generated every time step (kg)
+MdotFuel(n) = MFuelGen(n)/SFRJDt;                   % Fuel mass flow rate (kg/s)
+FuelMass(n) = FuelRho*FuelVol(n);                   % Grain fuel mass, instantaneous (kg)
 
 % Estimate Simulation Run Time
 MaxSimSteps = (GrainOD/2 - GrainID(1)/2)/RgrsPerStp + 1;
@@ -44,5 +37,3 @@ if GrainID(n) > GrainOD
     StopBurn = true;
     fprintf('Fuel Depleted\n')
 end
-
-

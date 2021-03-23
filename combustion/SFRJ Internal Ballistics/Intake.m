@@ -41,7 +41,7 @@ P_3(n) = P3_Po3(n)*Po_3(n);                                                     
 Rho_o_3(n) = Rho_o_2(n)*Po3_Po2(n);                                                         % Stag Density 3
 Rho_3(n) = Rho_Rho_o3(n)*Rho_o_3(n);                                                        % Static Density 3
 v_3(n) = mach_3(n)*sqrt(gamma*R*T_3(n));                                                    % Velocity at station 3
-MdotAir(n) = Rho_3(n)*Area_3*mach_3(n)*sqrt(gamma*R*T_3(n));                            % Mass flow rate
+MdotAir(n) = Rho_3(n)*Area_3*mach_3(n)*sqrt(gamma*R*T_3(n));                                % Mass flow rate
         
 % Station 4 (combustor)
 Astar_2(n) = Area_3/A_Astar_2(n);                                                           % Area to choke before normal shock

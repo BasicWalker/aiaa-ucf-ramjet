@@ -46,16 +46,15 @@ OxPercent       = 0.2314;                   % Density percentage of oxygen in ai
 
 flight_mach(1)  = 2.0;                      % Booster max mach
 altitude(1)     = 1100;                     % Initial altitude for ramjet start (m)
-c_d             = 0.24;                     % Drag coefficient (0.35)
+c_d             = 0.23;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
 gamma_atm       = 1.4;                      % Specific heat ratio
-R               = 287.05;                   % Ideal gas constant (J/kg*K)
 dry_mass        = 6.80389;                  % Mass of ramjet without fuelgrain (kg)
 
 % --------------- Fuel Grain User Defined Parameters --------------- %
 
 GrainOD         =  2.75 /In2Mtr;                        % Grain OD (m)
-GrainID(1)      =  1.25 /In2Mtr;                        % Grain ID (m)
+GrainID(1)      =  1.50 /In2Mtr;                        % Grain ID (m)
 GrainL          = 15.00 /In2Mtr;                        % Grain Length (m)
 FuelRho         = 1020;                                 % Grain Density (kg/m^3)
 PortArea(1)     = pi*(GrainID(1)^2)*(1/4);              % Fuel Port Area (m^2)
@@ -79,7 +78,7 @@ gamma           = 1.4;                      % Specific heat ratio (atm)
 
 NzlThrtDia      = 0.985 /In2Mtr;            % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR)
 NzlAT           = pi*(NzlThrtDia/2)^2;      % Throat area (m^2)
-NzlARatio          = 1.7;                      % Nozzle expansion ratio
+NzlARatio       = 1.7;                      % Nozzle expansion ratio
 
 % --------------- Chemistry User Defined Parameters ---------------- %
 

@@ -7,6 +7,7 @@
 % Name            Date      SCR  Description
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial Creation 
+% Ethan Sherlock  03/23/21  ---  Update Thrust Calculations
 % ---------------------------------------------------------------------- %
 
 % Calculate CStar based on O/F Ratio
@@ -22,11 +23,13 @@ if(CStar(n) < 0)
     CStar(n) = 0.0;
 end 
 
-% Thrust Calculations 
+% Thrust Calculations - Legacy Model
 Thrustdlvd(n) = MassGen(n)*CStar(n)/SFRJDt; % Thrust delivered, assuming thrust coefficient = 1.0
 
+% Thrust Calculations - Ramjet Model
 SpeedSound_exit(n) = sqrt(gamma_nzl*R*Temp_exit(n));
-Thrustdlvd2(n) = MdotTotal(n) * Mach_exit(n) * SpeedSound_exit(n);
+Velocity_exit(n) = Mach_exit(n) * SpeedSound_exit(n);
+Thrustdlvd2(n) = MdotAir(n) * ((1 + f_yield(n))*Velocity_exit(n) - velocity(n));
 
-Impulse(n) = Thrustdlvd(n)*SFRJDt;          % Impulse delivered
+Impulse(n) = Thrustdlvd2(n)*SFRJDt;         % Impulse delivered
 TotallImp(n) = sum(Impulse(:));             % Total Impulse

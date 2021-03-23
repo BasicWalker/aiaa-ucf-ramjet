@@ -21,6 +21,6 @@ if (n > 1)
     drag(n) = c_d*0.5*Rho_atm(n)*velocity(n)^2*S;                                           % Vehicle drag force
     mass(n) = dry_mass + FuelMass(n);                                                       % Vehicle mass
     weight(n) = gravity*mass(n);                                                            % Vehicle weight
-    acceleration(n) = (Thrustdlvd(n-1) - drag(n-1) - weight(n-1))/ mass(n-1);               % Vehicle acceleration
+    acceleration(n) = (Thrustdlvd2(n-1) - drag(n-1) - weight(n-1))/ mass(n-1);              % Vehicle acceleration
 end
 

@@ -34,13 +34,15 @@ Temp_exit(n) = T*T_AFT;                                             % Temperatur
 Mach_exit(n) = mach;                                                % Mach at exit plane
 
 % Chamber Pressure based on adiabatic flame temp
-[mach, T, P, rho, area] = flowisentropic(1.321, 1 ,'mach');         % Isentropic flow conditions at nozzle throat
+[mach, T, P, rho, area] = flowisentropic(gamma_nzlT(n), 1 ,'mach'); % Isentropic flow conditions at nozzle throat - BIGGG Assumption
 T_static(n)	= T*T_stag(n);                                          % Find static temp (K)
-V_soundNzlT(n) = sqrt(gamma_nzl*R*T_static(n));                     % Speed of sound at nozzle throat (m/s)
-V_flowRate(n) = mach * V_soundNzlT(n);                              % Flow velocity at nozzle throat (m/s)
+a_Nzl_T(n) = sqrt(gamma_nzl*R*T_static(n));                         % Speed of sound at nozzle throat (m/s)
+V_flowRate(n) = mach * a_Nzl_T(n);                                  % Flow velocity at nozzle throat (m/s)
 Rho_static(n) = MdotTotal(n)/(V_flowRate(n) * NzlAT);               % Static density at nozzle throat (kg/m^3)
 Rho_stag(n) = (1/rho)*Rho_static(n);                                % Stagnation density at nozzle throat (kg/m^3)
 PC_TAFT(n) = Rho_stag(n)*R*T_stag(n)/Pa2kPa;                        % Stagnation pressure = chamber pressure (kPa)
+
+% Chamber Pressure 
 
 % Fuel Mass Prop & O/F Ratio calculation
 OFRatio(n) = MOxdzrGen(n)/MFuelGen(n);                              % O/F Ratio

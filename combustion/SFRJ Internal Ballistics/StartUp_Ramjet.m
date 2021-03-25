@@ -44,8 +44,8 @@ OxPercent       = 0.2314;                   % Density percentage of oxygen in ai
 %% User Defined Parameters 
 % --------------- Environmental User Defined Parameters --------------- %
 
-flight_mach(1)  = 2.0;                      % Booster max mach
-altitude(1)     = 1100;                     % Initial altitude for ramjet start (m)
+flight_mach(1)  = 2.5;                      % Booster max mach
+altitude(1)     = 3100;                     % Initial altitude for ramjet start (m)
 c_d             = 0.23;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
 gamma_atm       = 1.4;                      % Specific heat ratio
@@ -68,17 +68,17 @@ FuelMass(1)     = FuelRho*FuelVol(1);                   % Grain fuel mass, insta
 InltD           = 1.00 / In2Mtr;            % Diameter of Combustor inlet (m)
 InltArea        = pi*InltD^2*(1/4);         % Area of inlet (m)
 gamma_Inlt      = 1.3845;                   % Specific heat ratio of air 
-Area_3          = 2.5459e-04;               % Area of throat (m^2) - Drives mass flow rate through intake
+Area_3          = 5.5061e-04;               % Area of throat (m^2) - Drives mass flow rate through intake
 radius_combustor= InltD/2;                  % Radius of the combustor inlet (m)
 Area_combustor  = pi*radius_combustor^2;    % Area of the combustor inlet (m^2)
-def             = 17;                       % Deflection angle (deg)
+def             = 10;                       % Deflection angle (deg)
 gamma           = 1.4;                      % Specific heat ratio (atm)
 
 % ----------------------------- Nozzle ----------------------------- %
 
-NzlThrtDia      = 0.985 /In2Mtr;            % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR)
+NzlThrtDia      = 1.8 /In2Mtr;              % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
 NzlAT           = pi*(NzlThrtDia/2)^2;      % Throat area (m^2)
-NzlARatio       = 1.7;                      % Nozzle expansion ratio
+NzlARatio       = 1.6;                      % Nozzle expansion ratio
 
 % --------------- Chemistry User Defined Parameters ---------------- %
 

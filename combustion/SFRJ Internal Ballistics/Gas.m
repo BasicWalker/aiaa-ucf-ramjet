@@ -42,7 +42,8 @@ Rho_static(n) = MdotTotal(n)/(V_flowRate(n) * NzlAT);               % Static den
 Rho_stag(n) = (1/rho)*Rho_static(n);                                % Stagnation density at nozzle throat (kg/m^3)
 PC_TAFT(n) = Rho_stag(n)*R*T_stag(n)/Pa2kPa;                        % Stagnation pressure = chamber pressure (kPa)
 
-% Chamber Pressure 
+% Isobaric Chamber Pressure 
+PC_Isobaric(n) = InltPres_stag(n);                                  % Constant pressure combustion (kPa)
 
 % Fuel Mass Prop & O/F Ratio calculation
 OFRatio(n) = MOxdzrGen(n)/MFuelGen(n);                              % O/F Ratio

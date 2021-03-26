@@ -116,16 +116,21 @@ acceleration(1) = (Thrustdlvd(1) - drag(1) - weight(1))/ mass(1);           % In
 while StopBurn == 0
     BurnTime(n) = time;                         % Simulation Time
     
+    
+    Intake                                      % Call Intake Model
     RegressionRate                              % Call Regression Rate Model
     GrainGeometry                               % Call Instantaneous Grain Geometry Model
-    Trajectory                                  % Call Trajectory Model
-    Intake                                      % Call Intake Model
     Gas                                         % Call Gas Model (And Chemistry Model)
     BoundaryLayer                               % Call Boundary Layer Model
+    Nozzle                                      % Call Nozzle Model
     Thrust                                      % Call Thrust Model
+    if StopBurn == 1                            % Do not update trajectory since fuel is depleted
+        break
+    end
+    Trajectory                                  % Call Trajectory Model
    
     time = time + SFRJDt;                       % Step through simulation time
     n = n + 1;
 end
-Nozzle                                          % Call Nozzle Model
+
 PlotData                                        % Plot Simulation Results

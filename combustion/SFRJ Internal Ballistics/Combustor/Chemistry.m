@@ -106,6 +106,7 @@ classdef Chemistry
                 / abs(sum(mol_mat(3:end).*self.CpMat(3:end)));
         end
         
+
         function [phi, T_AFT] = phiSolver(self, f, T_air)
             % ----------------- Initialize Values ----------------- % 
             f_yield = f;                        % Actual fuel to air ratio     

@@ -10,35 +10,31 @@
 % ---------------------------------------------------------------------- %
 
 function [mach2, staticTemp2, staticPres2, stagTemp2, stagPres2, stagPresLoss] = ...
-    RayleighFlow(gamma, Cp, mach1, staticTemp1, staticPres1, q)
+    RayleighFlow(g, mach1, stagTemp1, AFT, stagPres1)
 
-    [~, isenTempRatio1, isenPresRatio1, ~, ~] = flowisentropic(gamma, mach1, 'mach');
+    [~, ~, ~, ~, ~, stagTempRatRef1, stagPresRatRef1] = flowrayleigh(g, mach1, 'mach');
     
-    stagTemp1 = staticTemp1 / isenTempRatio1;
+    stagTempRef = stagTemp1 / stagTempRatRef1;
+    stagPresRef = stagPres1 / stagPresRatRef1;
     
-    stagPres1 = staticPres1 / isenPresRatio1;                             
-        
-    stagTemp2 = stagTemp1 + q/Cp;
+    stagTemp2 = AFT; 
     
-    [~, rayStaticTempRatio1, rayStaticPresRatio1, ~, ~, rayStagTempRatio1, ~] ...  
-        = flowrayleigh(gamma, mach1, 'mach');
+    stagTempRatRef2 = stagTemp2 / stagTempRef;
     
-    rayStagTempRatio2 = (stagTemp2/stagTemp1) * rayStagTempRatio1;
+    [mach2, ~, ~, ~, ~, ~, stagPresRatRef2] = flowrayleigh(g, stagTempRatRef2, 'totaltsub');
     
-    [mach2, rayStaticTempRatio2, rayStaticPresRatio2, ~, ~, ~, ~] ...
-        = flowrayleigh(gamma, rayStagTempRatio2, 'totaltsub');
+    stagPres2 = stagPresRef * stagPresRatRef2; 
     
-    [~, ~, isenPresRatio2, ~, ~] = flowisentropic(gamma, mach2, 'mach');
-
-    staticTemp2 = rayStaticTempRatio2 * (1/rayStaticTempRatio1) * staticTemp1;
+    [~,tempRatio2, presRatio2, ~,~] = flowisentropic(g, mach2, 'mach');
     
-    staticPres2 = rayStaticPresRatio2 * (1/rayStaticPresRatio1) * staticPres1;
+    staticPres2 = stagPres2 * presRatio2; 
     
-    stagPres2   = (1/isenPresRatio2) * staticPres2; 
+    staticTemp2 = stagTemp2 * tempRatio2; 
     
     stagPresLoss = stagPres1 - stagPres2; 
     
 end
+
     
     
     

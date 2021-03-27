@@ -14,16 +14,16 @@ function [mach2, staticTemp2, staticPres2, stagTemp2, stagPres2, stagPresLoss] =
 
     [~, ~, ~, ~, ~, stagTempRatRef1, stagPresRatRef1] = flowrayleigh(g, mach1, 'mach');
     
-    stagTempRef = stagTemp1 / stagTempRatRef1;
-    stagPresRef = stagPres1 / stagPresRatRef1;
+    stagTempRef1 = stagTemp1 / stagTempRatRef1;
+    stagPresRef1 = stagPres1 / stagPresRatRef1;
     
     stagTemp2 = AFT; 
     
-    stagTempRatRef2 = stagTemp2 / stagTempRef;
+    stagTempRatRef2 = stagTemp2 / stagTempRef1;
     
     [mach2, ~, ~, ~, ~, ~, stagPresRatRef2] = flowrayleigh(g, stagTempRatRef2, 'totaltsub');
     
-    stagPres2 = stagPresRef * stagPresRatRef2; 
+    stagPres2 = stagPresRef1 * stagPresRatRef2; 
     
     [~,tempRatio2, presRatio2, ~,~] = flowisentropic(g, mach2, 'mach');
     

@@ -68,7 +68,7 @@ dry_mass        = 6.80389;                  % Mass of ramjet without fuelgrain (
 % --------------- Fuel Grain User Defined Parameters --------------- %
 
 GrainOD         =  2.75 /In2Mtr;                        % Grain OD (m)
-GrainID(1)      =  1.50 /In2Mtr;                        % Grain ID (m)
+GrainID(1)      =  2.00 /In2Mtr;                        % Grain ID (m)
 GrainL          = 15.00 /In2Mtr;                        % Grain Length (m)
 FuelRho         = 1020;                                 % Grain Density (kg/m^3)
 PortArea(1)     = pi*(GrainID(1)^2)*(1/4);              % Fuel Port Area (m^2)
@@ -79,13 +79,13 @@ FuelMass(1)     = FuelRho*FuelVol(1);                   % Grain fuel mass, insta
 
 % ----------------- Intake User Defined Parameters ----------------- %
 
-InltD           = 1.00 / In2Mtr;            % Diameter of Combustor inlet (m)
+InltD           = 1.4 / In2Mtr;            % Diameter of Combustor inlet (m)
 InltArea        = pi*InltD^2*(1/4);         % Area of inlet (m)
 gamma_Inlt      = 1.3845;                   % Specific heat ratio of air 
-Area_intake     = 5.5061e-04;               % Area of throat (m^2) - Drives mass flow rate through intake
+Area_intake     = 0.001;               % Area of throat (m^2) - Drives mass flow rate through intake
 radius_combustor= InltD/2;                  % Radius of the combustor inlet (m)
 Area_combustor  = pi*radius_combustor^2;    % Area of the combustor inlet (m^2)
-def             = 10;                       % Deflection angle (deg)
+def             = 15;                       % Deflection angle (deg)
 gamma           = 1.4;                      % Specific heat ratio (atm)
 
 % ----------------------------- Nozzle ----------------------------- %
@@ -115,13 +115,9 @@ acceleration(1) = (Thrustdlvd(1) - drag(1) - weight(1))/ mass(1);           % In
 
 while StopBurn == 0
     BurnTime(n) = time;                         % Simulation Time
-    
-    
+      
     Intake                                      % Call Intake Model
-    RegressionRate                              % Call Regression Rate Model
-    GrainGeometry                               % Call Instantaneous Grain Geometry Model
-    Gas                                         % Call Gas Model (And Chemistry Model)
-    BoundaryLayer                               % Call Boundary Layer Model
+    CombustionChamber                           % Call Combustion Chamber Model
     Nozzle                                      % Call Nozzle Model
     Thrust                                      % Call Thrust Model
     if StopBurn == 1                            % Do not update trajectory since fuel is depleted

@@ -93,7 +93,7 @@ title('Equivalence Ratio vs Time')
 xlabel('Time (s)')
 ylabel('Equivalence Ratio (phi)')
 grid on
-ylim([0 16])
+% ylim([0 16])
 
 figure('Name','Adiabatic Flame Temperature')
 plot(BurnTime,T_stag)

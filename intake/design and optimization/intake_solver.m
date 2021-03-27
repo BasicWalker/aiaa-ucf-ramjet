@@ -28,13 +28,13 @@ end
 % define variables
 gamma = 1.4;  % specific heat ratio air
 R = 287;  % gas constant air <J/(kg*K)>
-mach1 = 2.1;  % free stream mach
-deflectionAngle = 17;  % single intake ramp deflection angle <deg>
-altitude = 5;     % altitude at mach 2 (erich's code) <km>    
+mach1 = 2.2;  % free stream mach
+deflectionAngle = 15;  % single intake ramp deflection angle <deg>
+altitude = 3.1;     % altitude at mach 2 (erich's code) <km>    
 radiusCowl = 1.25*0.0254;  % radius of cowl <m>
-radiusCombustor = 0.5*0.0254;  % radius of combustion chamber inlet opening <m>
+radiusCombustor = 0.7*0.0254;  % radius of combustion chamber inlet opening <m>
 areaCombustor =  pi*radiusCombustor^2;  % area of combustor inlet <m^2>
-pressureCombustor = 400e3;  % combustion chamber pressure <kPa>
+pressureCombustor = 500e3;  % combustion chamber pressure <kPa>
 
 stepLim = 1000;  % convergence iteration step limit
 tolerance = 0.0001;  % tolerance for residual
@@ -142,6 +142,7 @@ else
         ind = i;
         i = i+1;
     end
+    display(areaThroat(ind));
     radiusThroat = sqrt((pi*radiusCowl^2 - areaThroat(ind))/pi);
     massflow2 = staticDens2*velocity2*areaThroat(ind);  % % <kg/s>
     massflow3 = staticDens3*velocity3*areaThroat(ind);  % <kg/s>

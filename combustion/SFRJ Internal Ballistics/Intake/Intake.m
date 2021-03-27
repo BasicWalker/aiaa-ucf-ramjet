@@ -69,6 +69,8 @@ intakeVelocity(4,n) = intakeMach(4,n)*sqrt(gamma*R*staticTemp(4,n));  % <m/s>
 
 % Pass variables to ballistic simulator
 InltPres_stag(n) = stagPres(4,n);  % Inlet stagnation pressure
+InltTemp_stag(n) = stagTemp(4,n);  % Inlet stagnation temperature
+InltTemp_dens(n) = stagDens(4,n);  % Inlet stagnation density
 InltPres(n) = staticPres(4,n);  % Inlet static pressure
 InltRho(n) = staticDens(4,n);  % Inlet static density
 InltTemp(n) = staticTemp(4,n);  % Inlet static temp

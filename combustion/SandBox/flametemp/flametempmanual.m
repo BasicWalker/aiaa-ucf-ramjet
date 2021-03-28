@@ -207,16 +207,16 @@ for (temp = 2500:100:3500)
     k = macpp/macvp;
 
     figure(5)
-    plot(temp, mcpp, '*'); hold on
+    plot(temp, macpp, '*'); hold on
     grid on;
     xlabel('Product Temperature (K)');
-    ylabel('Average Molar Cp of Products');
+    ylabel('Average Cp of Products (kJ/kg * K)');
 
     figure(6)
-    plot(temp, mcvp, '*'); hold on
+    plot(temp, macvp, '*'); hold on
     grid on;
     xlabel('Product Temperature (K)');
-    ylabel('Average Molar Cv of Products');
+    ylabel('Average Cv of Products (kJ/kg * K)');
 
     figure(7)
     plot(temp, k, '*'); hold on

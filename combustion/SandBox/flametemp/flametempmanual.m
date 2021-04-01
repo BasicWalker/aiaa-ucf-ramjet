@@ -1,4 +1,16 @@
+% -------------- Flame Temp Manual / UCF CAPSTONE PROJECT -------------- %
+% File Name: PlotData.m 
+%
+% File Description: 
+% Plots all results
+% 
+% Name            Date      SCR  Description
+% --------------  --------  ---  ------------------------------
+% Nathan Stark    04/01/21  ---  Initial Creation 
+% ---------------------------------------------------------------------- %
+
 %Ideal gas variable calculator
+clc; clear all; close all;
 
 %----------ABS------------%
 

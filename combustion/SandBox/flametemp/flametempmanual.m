@@ -53,11 +53,7 @@ for (temp = 2500:100:3500)
     mafh2o = massh2o/massp;
     mafco2 = massco2/massp;
     mafn2 = massn2/massp;
-    
-    %Average Molar Cp values
-    mcpr = (mfabs * mcpabs)  + (mfair * mcpair); %Reactants
-    mcpp = (mfh2o * mcph2o) + (mfco2 * mcpco2) + (mfn2 * mcpn2);
-    
+        
     
     %Average Mass Cp value
     macpp = (mafh2o * cph2o) + (mafco2 * cpco2) + (mafn2 * cpn2)

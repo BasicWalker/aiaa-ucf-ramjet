@@ -106,7 +106,7 @@ if (mean(InltMach) > 0.2)
     fprintf(2,'\nWARNING: Inlet Mach number is too high.\n')
 end
 if (mean(phi_eqv) > 3.0)
-    fprintf(2,'WARNING: Equivalence Ratio is too high.\n')
+    fprintf(2,'WARNING: Equivalence ratio exceeds flamability limit.\n')
 end
 if (flight_mach(n-1) < 2)
     fprintf(2,'WARNING: Vehicle does not reach target Mach Number.\n')

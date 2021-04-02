@@ -96,10 +96,14 @@ grid on
 ylim([0 16])
 
 figure('Name','Adiabatic Flame Temperature')
+yyaxis left
 plot(BurnTime,T_stag)
-title('Adiabatic Flame Temperature vs Time')
+title('Adiabatic Flame Temperature & Specific Heat Ratio')
 xlabel('Time (s)')
 ylabel('Temperature <k>')
+yyaxis right
+plot(BurnTime,gamma_t)
+ylabel('Specific Heat Ratio')
 grid on
 
 if (mean(InltMach) > 0.2)
@@ -125,7 +129,7 @@ fprintf('Max Altitude(During Boost): %.2f (m)\n',max(altitude))
 fprintf('Average Inlet Mach:         %.2f  \n', mean(InltMach))
 fprintf('Average O/F Ratio:          %.2f  \n',mean(OFRatio))
 fprintf('Average Equivalence Ratio:  %.2f  \n',mean(phi_eqv))
-
+fprintf('Average Gamma Ratio:        %.2f  \n',mean(gamma_t))
 fprintf('--------------------------------------------\n')
 
 

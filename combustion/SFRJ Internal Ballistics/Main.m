@@ -14,7 +14,6 @@
 
 while StopBurn == 0
     BurnTime(n) = time;                         % Simulation Time
-    
     RegressionRate                              % Call Regression Rate Model
     GrainGeometry                               % Call Instantaneous Grain Geometry Model
     Trajectory                                  % Call Trajectory Model
@@ -22,7 +21,6 @@ while StopBurn == 0
     Gas                                         % Call Gas Model (And Chemistry Model)
     BoundaryLayer                               % Call Boundary Layer Model
     Thrust                                      % Call Thrust Model
-   
     time = time + SFRJDt;                       % Step through simulation time
     n = n + 1;
 end

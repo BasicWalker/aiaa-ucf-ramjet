@@ -34,7 +34,7 @@ clc; clear; close all;
     mwn2 = 28.013;
 
     cpair = 29.67; 
-    i = 1;
+    
 for (temp = 2500:100:3500)
     
     fprintf("Temp = %d", temp);
@@ -66,7 +66,6 @@ for (temp = 2500:100:3500)
     mafco2 = massco2/massp;
     mafn2 = massn2/massp;
         
-    
     %Sum Mass Fraction Cp values
     macpp = (mafh2o * cph2o) + (mafco2 * cpco2) + (mafn2 * cpn2);
 

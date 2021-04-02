@@ -10,7 +10,7 @@
 % ---------------------------------------------------------------------- %
 
 %Ideal gas variable calculator
-clc; clear all; close all;
+clc; clear; close all;
 
 %----------ABS------------%
 
@@ -34,26 +34,26 @@ clc; clear all; close all;
     mwn2 = 28.013;
 
     cpair = 29.67; 
-    
+    i = 1;
 for (temp = 2500:100:3500)
     
     fprintf("Temp = %d", temp);
      cpabs = 1.423; %Average value given, won't change with temperature
 
     %Molar Cp values
-    mcpabs = cpabs*mwabs
-    mcpair = cpair
+    mcpabs = cpabs*mwabs;
+    mcpair = cpair;
 
     %Molar CP must be calculated for high temperatures
     x = temp/100;
-    mcph2o = 143.05 - (183.54 * (x^0.25)) + (82.751 * (x^ 0.5)) - (3.6989 * x)
-    mcpco2 = -3.7357 + (30.529 * (x^0.5)) - (4.1034 * x) + (.024198 * (x^2))
-    mcpn2 = 39.06 - (512.79 * (x^(-1.5))) + (1072.7 * (x^(-2))) - (820.4 * (x^(-3)))
+    mcph2o = 143.05 - (183.54 * (x^0.25)) + (82.751 * (x^ 0.5)) - (3.6989 * x);
+    mcpco2 = -3.7357 + (30.529 * (x^0.5)) - (4.1034 * x) + (.024198 * (x^2));
+    mcpn2 = 39.06 - (512.79 * (x^(-1.5))) + (1072.7 * (x^(-2))) - (820.4 * (x^(-3)));
     
     %Molar basis to mass basis
-    cph2o = mcph2o/mwh2o
-    cpco2 = mcpco2/mwco2
-    cpn2 = mcpn2/mwn2
+    cph2o = mcph2o/mwh2o;    %kJ/Kg
+    cpco2 = mcpco2/mwco2;
+    cpn2 = mcpn2/mwn2;
     
     %Mass Fractions
     massh2o = molh2o * mwh2o;
@@ -67,28 +67,27 @@ for (temp = 2500:100:3500)
     mafn2 = massn2/massp;
         
     
-    %Average Mass Cp value
-    macpp = (mafh2o * cph2o) + (mafco2 * cpco2) + (mafn2 * cpn2)
+    %Sum Mass Fraction Cp values
+    macpp = (mafh2o * cph2o) + (mafco2 * cpco2) + (mafn2 * cpn2);
 
     %---IDEAL GAS VALUES---%
 
     Ru = 8.314; %kJ/kmol * K
     R_abs = Ru/mwabs;
     R_air = Ru/mwair;
-    R_h2o = Ru/mwh2o
-    R_co2 = Ru/mwco2
+    R_h2o = Ru/mwh2o;
+    R_co2 = Ru/mwco2;
     R_n2 = Ru/mwn2
 
-    Cv_abs = mcpabs - R_abs;
-    Cv_air = mcpair - R_air;
     Cv_h2o = cph2o - R_h2o;
     Cv_co2 = cpco2 - R_co2;
     Cv_n2 = cpn2 - R_n2;
 
+    % Sum Mass Fraction of Cv Values
     macvp = (mafh2o * Cv_h2o) + (mafco2 * Cv_co2) + (mafn2 * Cv_n2);
 
     k = macpp/macvp;
-
+    
     figure(5)
     plot(temp, macpp, '*'); hold on
     grid on;
@@ -106,6 +105,6 @@ for (temp = 2500:100:3500)
     grid on;
     xlabel('Temperature (K)');
     ylabel('Specific Heat Ratio of Products');
-    
 end
- 
+
+    

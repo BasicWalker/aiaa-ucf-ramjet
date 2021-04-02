@@ -35,10 +35,9 @@
 close all; clear; clc;
 % ------------------------- Import Tables ------------------------- %
 
-if exist('T','var')==0                      % GRAM atmosphereic model
+if exist('GRAM','var')==0                      % GRAM atmospheric model
     load GRAM_Model.mat                     
 end
-GRAM = T; 
 
 % --------------------- Initialize Variables ---------------------- %
 

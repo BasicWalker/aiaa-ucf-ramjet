@@ -20,8 +20,7 @@ MdotTotal(n) = MdotAir(n) + MdotFuel(n);                            % Total mass
 f_yield(n) = (MFuelGen(n)/MairGen(n));                              % fuel to air ratio 
 
 % --------------------- Chemistry Model --------------------- %
-[phi, T_AFT] = chem.phiSolver(f_yield(n),475);                      % Call Chemistry Model, need to add T_air before combustion chamber 475
-T_stag(n) = T_AFT;                                                  % Stagnation temp in nozzle
+[phi, T_stag(n)] = chem.phiSolver(f_yield(n),475);                      % Call Chemistry Model, need to add T_air before combustion chamber 475
 gamma_nzl = 1.3845;                                                 % Temporary
 gamma_nzlT(n) = gamma_nzl;                                          % Gamma at the nozzle throat
 phi_eqv(n) = phi;                                                   % Grab phi value

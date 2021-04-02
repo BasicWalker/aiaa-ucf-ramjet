@@ -16,63 +16,82 @@
 % station 3: downstream of normal shock, upstream of subsonic iscentropic expansion (throat)
 % station 4: downstream of subsonic iscentropic expansion combustor inlet,(combustion chamber opening)
 
+intake.Area_enter =  Area_intake;
+
 % Station 1 properties (free-stream)-----
-intakeMach(1,n) = flight_mach(n);
-staticPres(1,n) = pressure_atm(n);  % <Pa>
-staticDens(1,n) = Rho_atm(n);  % <kg/m^3>   
-staticTemp(1,n) = Temp_atm(n);  % <K> 
-[~, tempRatio(1,n), presRatio(1,n), densRatio(1,n), ~] = flowisentropic(gamma, intakeMach(1,n), 'mach');  % ratios are static over stagnation
-stagTemp(1,n) = staticTemp(1,n)/tempRatio(1,n);  % <K>                                                 
-stagPres(1,n) = staticPres(1,n)/presRatio(1,n);  % <Pa>                                                 
-stagDens(1,n) = staticDens(1,n)/densRatio(1,n);  % <kg/m^3>                                                   
-intakeVelocity(1,n) = intakeMach(1,n)*sqrt(gamma*R*staticTemp(1,n));  % <m/s>                                          
+intake.mach(1,n) = flight_mach(n);
+intake.staticPres(1,n) = pressure_atm(n);  % <Pa>
+intake.staticDens(1,n) = Rho_atm(n);  % <kg/m^3>   
+intake.staticTemp(1,n) = Temp_atm(n);  % <K> 
+[~, intake.tempRatio(1,n), intake.presRatio(1,n), intake.densRatio(1,n), ~] = flowisentropic(gamma, intake.mach(1,n), 'mach');  % ratios are static over stagnation
+intake.stagTemp(1,n) = intake.staticTemp(1,n)/intake.tempRatio(1,n);  % <K>                                                 
+intake.stagPres(1,n) = intake.staticPres(1,n)/intake.presRatio(1,n);  % <Pa>                                                 
+intake.stagDens(1,n) = intake.staticDens(1,n)/intake.densRatio(1,n);  % <kg/m^3>                                                   
+intake.velocity(1,n) = intake.mach(1,n)*sqrt(gamma*R*intake.staticTemp(1,n));  % <m/s>                                          
          
 % Station 2 properties (oblique shock)----- 
-[intakeMach(2,n), shockAngle(n)] = obliqueShock(intakeMach(1,n), def, gamma);  % uniform mach number of external ramp region
-Mach1Norm(n) = intakeMach(1,n)*sind(shockAngle(n));  % flow component crossing normal to oblique shock                                  
-[~, tempRatio(2,n), presRatio(2,n), densRatio(2,n), ~, stagPresRatio(2,n)] = ...
-    flownormalshock(gamma, Mach1Norm(n), 'mach');  % ratios are downstream over upstream
-stagPres(2,n) = stagPres(1,n) * stagPresRatio(2,n);  % <Pa>
-stagDens(2,n) = stagDens(1,n) * stagPresRatio(2,n);  % changes with the same rate as pressure (ideal gas law) <kg/m3>
-stagTemp(2,n) = stagTemp(1,n);  % does not change over normal shock <K>
-staticPres(2,n) = staticPres(1,n) * presRatio(2,n);  % <Pa>
-staticDens(2,n) = staticDens(1,n) * densRatio(2,n);  % <kg/m3>
-staticTemp(2,n) = staticTemp(1,n) * tempRatio(2,n);  % <K>
-intakeVelocity(2,n) = intakeMach(2,n)*sqrt(gamma*R*staticTemp(2,n));  % <m/s>
-[~, ~, ~, ~, A_Astar(2,n)] = flowisentropic(gamma, intakeMach(2,n), 'mach');
-Astar(2,n) = Area_intake/A_Astar(2,n);  % Area to choke before normal shock
-        
+[intake.mach(2,n), intake.shockAngle(n)] = obliqueShock(intake.mach(1,n), def, gamma);  % uniform mach number of external ramp region
+intake.mach1Norm(n) = intake.mach(1,n)*sind(intake.shockAngle(n));  % flow component crossing normal to oblique shock                                  
+[~, intake.tempRatio(2,n), intake.presRatio(2,n), intake.densRatio(2,n), ~, intake.stagPresRatio(2,n)] = ...
+    flownormalshock(gamma, intake.mach1Norm(n), 'mach');  % ratios are downstream over upstream
+intake.stagPres(2,n) = intake.stagPres(1,n) * intake.stagPresRatio(2,n);  % <Pa>
+intake.stagDens(2,n) = intake.stagDens(1,n) * intake.stagPresRatio(2,n);  % changes with the same rate as pressure (ideal gas law) <kg/m3>
+intake.stagTemp(2,n) = intake.stagTemp(1,n);  % does not change over normal shock <K>
+intake.staticPres(2,n) = intake.staticPres(1,n) * intake.presRatio(2,n);  % <Pa>
+intake.staticDens(2,n) = intake.staticDens(1,n) * intake.densRatio(2,n);  % <kg/m3>
+intake.staticTemp(2,n) = intake.staticTemp(1,n) * intake.tempRatio(2,n);  % <K>
+intake.velocity(2,n) = intake.mach(2,n)*sqrt(gamma*R*intake.staticTemp(2,n));  % <m/s>
+[~, ~, ~, ~, intake.A_Astar(2,n)] = flowisentropic(gamma, intake.mach(2,n), 'mach');
+intake.Astar(2,n) = intake.Area_enter/intake.A_Astar(2,n);  % Area to choke before normal shock
+% check for choked conditions       
+if intake.stagPres(2,n) < pressureCombustor
+    error('intake:obliqueStagLoss',...
+        'Error. \nOblique shock stagnation pressure loss too great\ncannot provide enough stagnation pressure; flow is no longer choked. \nTry decreasing altitude, deflection angle or increasing speed.');
+end
+[~, ~, ~, ~, ~, intake.r_d_chokeLimit(n)] = flownormalshock(gamma, intake.Mach(2,n), 'mach');  % ratios are downstream over upstream
+if (intake.stagPres(2,n)*intake.r_d_chokeLimit(n)) < pressureCombustor
+    error('intake:normalStagLoss',...
+        'Error. \nNormal shock stagnation pressure loss too great\ncannot provide enough stagnation pressure; flow is no longer choked. \nTry reducing the strength of the normal shock.');
+end
+
 % Station 3 properties (normal shock)-----
-[~, tempRatio(3,n), presRatio(3,n), densRatio(3,n), intakeMach(3,n), stagPresRatio(3,n)] = ...
-    flownormalshock(gamma, intakeMach(2,n), 'mach');  % ratios are downstream over upstream
-stagPres(3,n) = stagPres(2,n) * stagPresRatio(3,n);  % <Pa>
-stagDens(3,n) = stagDens(2,n) * stagPresRatio(3,n);  % changes with the same rate as pressure (ideal gas law) <kg/m3>
-stagTemp(3,n) = stagTemp(2,n);  % does not change over normal shock <K>
-staticPres(3,n) = staticPres(2,n) * presRatio(3,n);  % <Pa>
-staticDens(3,n) = staticDens(2,n) * densRatio(3,n);  % <kg/m3>
-staticTemp(3,n) = staticTemp(2,n) * tempRatio(3,n);  % <K>
-intakeVelocity(3,n) = intakeMach(3,n)*sqrt(gamma*R*staticTemp(3,n));  % <m/s>
-MdotAir(n) = staticDens(3,n)*Area_intake*intakeVelocity(3,n);  % air mass flow at intake opening <kg/s>
-Astar(3,n) = Astar(2,n)/stagPresRatio(3,n);  % Area to choke after nomal shock
-A_Astar(3,n) = Area_combustor/Astar(3,n);  % Area ratio of the combustor inlet  
+% solve normal shock placement
+r_d = nozzle.stagPres/intake.stagPres(2,n);
+[intake.machShock(n), tempRatio(3,n), presRatio(3,n), densRatio(3,n), intake.mach(3,n), stagPresRatio(3,n), ~] = flownormalshock(gamma, r_d, 'totalp');
+if intake.machShock(n) < intake.mach(2,n)
+    error('intake:shockEjected',...
+        'Error. \nNormal shock ejected; losing mass flow. \ndiffuser ratio (r_d) too high.');
+end
+intake.stagPres(3,n) = intake.stagPres(2,n) * intake.stagPresRatio(3,n);  % <Pa>
+intake.stagDens(3,n) = intake.stagDens(2,n) * intake.stagPresRatio(3,n);  % changes with the same rate as pressure (ideal gas law) <kg/m3>
+intake.stagTemp(3,n) = intake.stagTemp(2,n);  % does not change over normal shock <K>
+intake.staticPres(3,n) = intake.staticPres(2,n) * intake.presRatio(3,n);  % <Pa>
+intake.staticDens(3,n) = intake.staticDens(2,n) * intake.densRatio(3,n);  % <kg/m3>
+intake.staticTemp(3,n) = intake.staticTemp(2,n) * intake.tempRatio(3,n);  % <K>
+intake.velocity(3,n) = intake.mach(3,n)*sqrt(gamma*R*intake.staticTemp(3,n));  % <m/s>
+intake.massFlow(n) = intake.staticDens(3,n)*intake.Area_enter*intake.velocity(3,n);  % air mass flow at intake opening <kg/s>
+[~, ~, ~, ~, intake.A_Astar(3,n)] = flowisentropic(gamma, intake.machShock(n), 'mach');
+intake.AShock = intake.A_Astar(3,n)*intake.Astar(2,n);  % area of where the normal shock occurs
+intake.Astar(3,n) = intake.Astar(2,n)/intake.stagPresRatio(3,n);  % reference area after normal shock 
 
 % Station 4 properties (subsonic iscentropic expansion)-----  
-[intakeMach(4,n), tempRatio(4,n), presRatio(4,n), densRatio(4,n), ~] = ...
-    flowisentropic(gamma, A_Astar(3,n), 'sub');  % ratios are static over stagnation
-stagPres(4,n) = stagPres(3,n);  % does not change; iscentropic <Pa>
-stagDens(4,n) = stagDens(3,n);  % does not change; iscentropic <kg/m3>
-stagTemp(4,n) = stagTemp(3,n);  % does not change; iscentropi <K>
-staticPres(4,n) = stagPres(4,n) * presRatio(4,n);  % <Pa>
-staticDens(4,n) = stagDens(4,n) * densRatio(4,n);  % <kg/m3>
-staticTemp(4,n) = stagTemp(4,n) * tempRatio(4,n);  % <K>
-intakeVelocity(4,n) = intakeMach(4,n)*sqrt(gamma*R*staticTemp(4,n));  % <m/s>
+intake.A_Astar(4,n) = Area_combustor/intake.Astar(3,n);  % Area ratio of the combustor inlet
+[intake.mach(4,n), intake.tempRatio(4,n), intake.presRatio(4,n), intake.densRatio(4,n), ~] = ...
+    flowisentropic(gamma, intake.A_Astar(4,n), 'sub');  % ratios are static over stagnation
+intake.stagPres(4,n) = intake.stagPres(3,n);  % does not change; iscentropic <Pa>
+intake.stagDens(4,n) = intake.stagDens(3,n);  % does not change; iscentropic <kg/m3>
+intake.stagTemp(4,n) = intake.stagTemp(3,n);  % does not change; iscentropi <K>
+intake.staticPres(4,n) = intake.stagPres(4,n) * intake.presRatio(4,n);  % <Pa>
+intake.staticDens(4,n) = intake.stagDens(4,n) * intake.densRatio(4,n);  % <kg/m3>
+intake.staticTemp(4,n) = intake.stagTemp(4,n) * intake.tempRatio(4,n);  % <K>
+intake.velocity(4,n) = intake.mach(4,n)*sqrt(gamma*R*intake.staticTemp(4,n));  % <m/s>
 
 % Pass variables to ballistic simulator
-InltPres_stag(n) = stagPres(4,n);  % Inlet stagnation pressure
-InltTemp_stag(n) = stagTemp(4,n);  % Inlet stagnation temperature
-InltTemp_dens(n) = stagDens(4,n);  % Inlet stagnation density
-InltPres(n) = staticPres(4,n);  % Inlet static pressure
-InltRho(n) = staticDens(4,n);  % Inlet static density
-InltTemp(n) = staticTemp(4,n);  % Inlet static temp
-InltVel(n) = intakeVelocity(4,n);  % Inlet velocity
-InltMach(n) = intakeMach(4,n);  % Inlet mach number
+InltPres_stag(n) = intake.stagPres(4,n);  % Inlet stagnation pressure
+InltTemp_stag(n) = intake.stagTemp(4,n);  % Inlet stagnation temperature
+InltTemp_dens(n) = intake.stagDens(4,n);  % Inlet stagnation density
+InltPres(n) = intake.staticPres(4,n);  % Inlet static pressure
+InltRho(n) = intake.staticDens(4,n);  % Inlet static density
+InltTemp(n) = intake.staticTemp(4,n);  % Inlet static temp
+InltVel(n) = intake.velocity(4,n);  % Inlet velocity
+InltMach(n) = intake.Mach(4,n);  % Inlet mach number

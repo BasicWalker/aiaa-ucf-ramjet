@@ -28,21 +28,12 @@ xlabel('Time (s)')
 ylabel('')
 grid on
 
-% figure('Name','A/F Ratio')
-% hold on
-% plot(BurnTime,AFRatio, BurnTime,AFRst)
-% title('Air to Fuel Ratios')
-% xlabel('Time (s)')
-% ylabel('')
-% legend('A/F Results','A/F Target')
-% grid on
-
 figure('Name','Force Profile')
-plot(BurnTime,Thrustdlvd,BurnTime,drag)
+plot(BurnTime,Thrustdlvd2,BurnTime,drag, BurnTime, mass*gravity, BurnTime, (Thrustdlvd2 - mass*gravity - drag))
 title('Thrust & Drag vs Time')
 xlabel('Time (s)')
 ylabel('Force (N)')
-legend('Thrust Curve','Drag')
+legend('Thrust Curve','Drag','Weight','Net Force')
 grid on
 
 figure('Name','Mass Flow Rate')
@@ -66,7 +57,7 @@ plot(BurnTime, InltPres_stag, BurnTime, PCreq, BurnTime, pressure_atm, BurnTime,
 title('Pressure Plots')
 xlabel('Time (s)')
 ylabel('Pressure (kPa)')
-legend('Inlet Pressure','Required Pressure - Choked Flow','Back Pressure', 'Chamber Pressure - Adiabatic Flame Temp')
+legend('Inlet Pressure (stag)','Required Pressure - Choked Flow (stag)','Back Pressure (stag)', 'Chamber Pressure - Adiabatic Flame Temp (stag)')
 grid on
 
 figure('Name','Velocity & Acceleration Profiles')
@@ -105,31 +96,40 @@ grid on
 ylim([0 16])
 
 figure('Name','Adiabatic Flame Temperature')
+yyaxis left
 plot(BurnTime,T_stag)
-title('Adiabatic Flame Temperature vs Time')
+title('Adiabatic Flame Temperature & Specific Heat Ratio')
 xlabel('Time (s)')
 ylabel('Temperature <k>')
+yyaxis right
+plot(BurnTime,gamma_t)
+ylabel('Specific Heat Ratio')
 grid on
 
 if (mean(InltMach) > 0.2)
     fprintf(2,'\nWARNING: Inlet Mach number is too high.\n')
 end
 if (mean(phi_eqv) > 3.0)
-    fprintf(2,'WARNING: Equivalence Ratio is too high.\n')
+    fprintf(2,'WARNING: Equivalence ratio exceeds flamability limit.\n')
+end
+if (flight_mach(n-1) < 2)
+    fprintf(2,'WARNING: Vehicle does not reach target Mach Number.\n')
 end
 
 fprintf('------------ Simulation Results ------------\n')
-fprintf('Burn Time:                 %.2f   (s)\n', BurnTime(n-1))
-fprintf('Average Thrust:            %.2f  (N)\n', mean(Thrustdlvd))
-fprintf('Average Drag Force:        %.2f  (N)\n',mean(drag))
-fprintf('Total Impulse:             %.2f (Ns)\n', TotallImp(n-1))
-fprintf('Inlet Mass Flow Rate:      %.3f   (kg/s)\n', mean(InltMassFlw))
-fprintf('PC From TAFT:              %.2f  (kPa)\n',mean(PC_TAFT))
-fprintf('Initial Step Height:       %.2f    (in) \n', StepHeight(1)*In2Mtr)
-fprintf('Average Inlet Velocity:    %.2f  (m/s)\n', mean(InltVel))
-fprintf('Average Inlet Mach:        %.2f  \n', mean(InltMach))
-fprintf('Average O/F Ratio:         %.2f  \n',mean(OFRatio))
-fprintf('Average Equivalence Ratio: %.2f  \n',mean(phi_eqv))
+fprintf('Burn Time:                  %.2f    (s)\n', BurnTime(n-1))
+fprintf('Average Thrust:             %.2f   (N)\n', mean(Thrustdlvd))
+fprintf('Average Drag Force:         %.2f   (N)\n',mean(drag))
+fprintf('Total Impulse:              %.2f  (Ns)\n', TotallImp(n-1))
+fprintf('Air Mass Flow Rate:         %.3f    (kg/s)\n', mean(MdotAir))
+fprintf('PC From TAFT:               %.2f  (kPa)\n',mean(PC_TAFT))
+fprintf('Initial Step Height:        %.2f     (in) \n', StepHeight(1)*In2Mtr)
+fprintf('Average Inlet Velocity:     %.2f   (m/s)\n', mean(InltVel))
+fprintf('Max Altitude(During Boost): %.2f (m)\n',max(altitude))
+fprintf('Average Inlet Mach:         %.2f  \n', mean(InltMach))
+fprintf('Average O/F Ratio:          %.2f  \n',mean(OFRatio))
+fprintf('Average Equivalence Ratio:  %.2f  \n',mean(phi_eqv))
+fprintf('Average Gamma Ratio:        %.2f  \n',mean(gamma_t))
 fprintf('--------------------------------------------\n')
 
 

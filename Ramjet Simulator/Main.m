@@ -32,7 +32,7 @@
 % Ethan Sherlock  03/12/21  ---  Add Intake Initialization  
 % 
 % ---------------------------------------------------------------------- %
-close all; clear; clc;
+clear; clc; close all;
 % ------------------------- Import Tables ------------------------- %
 
 if exist('GRAM','var')==0                      % GRAM atmospheric model
@@ -58,7 +58,7 @@ OxPercent       = 0.2314;                   % Density percentage of oxygen in ai
 % --------------- Environmental User Defined Parameters --------------- %
 
 flight_mach(1)  = 2.5;                      % Booster max mach
-altitude(1)     = 3100;                     % Initial altitude for ramjet start (m)
+altitude(1)     = 3000;                     % Initial altitude for ramjet start (m)
 c_d             = 0.23;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
 gamma_atm       = 1.4;                      % Specific heat ratio

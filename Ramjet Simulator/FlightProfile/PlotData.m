@@ -96,17 +96,21 @@ grid on
 % ylim([0 16])
 
 figure('Name','Adiabatic Flame Temperature')
+yyaxis left
 plot(BurnTime,T_stag)
-title('Adiabatic Flame Temperature vs Time')
+title('Adiabatic Flame Temperature & Specific Heat Ratio')
 xlabel('Time (s)')
 ylabel('Temperature <k>')
+yyaxis right
+plot(BurnTime,gamma_t)
+ylabel('Specific Heat Ratio')
 grid on
 
 if (mean(InltMach) > 0.2)
     fprintf(2,'\nWARNING: Inlet Mach number is too high.\n')
 end
 if (mean(phi_eqv) > 3.0)
-    fprintf(2,'WARNING: Equivalence Ratio is too high.\n')
+    fprintf(2,'WARNING: Equivalence ratio exceeds flamability limit.\n')
 end
 if (flight_mach(n-1) < 2)
     fprintf(2,'WARNING: Vehicle does not reach target Mach Number.\n')
@@ -125,7 +129,7 @@ fprintf('Max Altitude(During Boost): %.2f (m)\n',max(altitude))
 fprintf('Average Inlet Mach:         %.2f  \n', mean(InltMach))
 fprintf('Average O/F Ratio:          %.2f  \n',mean(OFRatio))
 fprintf('Average Equivalence Ratio:  %.2f  \n',mean(phi_eqv))
-
+fprintf('Average Gamma Ratio:        %.2f  \n',mean(gamma_t))
 fprintf('--------------------------------------------\n')
 
 

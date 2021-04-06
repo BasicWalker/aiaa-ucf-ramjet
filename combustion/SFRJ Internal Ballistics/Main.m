@@ -42,8 +42,8 @@ OxPercent       = 0.2314;                   % Density percentage of oxygen in ai
 %% User Defined Parameters 
 % --------------- Environmental User Defined Parameters --------------- %
 
-Mach_f(1)       = 2.5;                      % Booster max mach
-altitude(1)     = 3000.0;                   % Initial altitude for ramjet start (m)
+Mach_f(1)       = 2.0;                      % Booster max mach
+altitude(1)     = 1000.0;                   % Initial altitude for ramjet start (m)
 c_d             = 0.23;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
 k               = 1.4;                      % Specific heat ratio (air)
@@ -84,7 +84,7 @@ chem = Chemistry();                                     % Initialize Chemistry M
 
 % ----------------- Trajectory Initial Conditions ------------------ %
 
-alpha           = 3.0;                                                      % Launch Angle (deg) - in reference to horizon
+alpha           = 0.0;                                                      % Launch Angle (deg) - in reference to horizon
 Rho_a(1)        = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);    % Atmospheric Density (kg/m^3)
 pressure_atm(1) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(1))/1e3);    % Atmospheric Pressure (Pa)
 pressure_atm(1) = pressure_atm(1)/Pa2kPa;                                   % Atmospheric Pressure (kPa)
@@ -100,7 +100,7 @@ F_t(1)          = 0.0;                                                      % Th
 F_tx(1)         = F_t(1)*cosd(alpha);                                       % Thrust X (N)
 F_tz(1)         = F_t(1)*sind(alpha);                                       % Thrust Z (N)
 F_x(1)          = F_tx(1) - F_dx(1);                                        % Force X (N)
-F_z(1)          = F_tz(1) - F_dz(1) - Mass(1)*gravity;                      % Force Z (N)
+F_z(1)          = F_tz(1) - F_dz(1);% - Mass(1)*gravity;                      % Force Z (N)
 F_net(1)        = sqrt(F_x(n)^2 + F_z(n)^2);                                % Force (N)
 Acc(1)          = F_net(1)/Mass(1);                                         % Acceleration (m/s/s)
 Acc_x(1)        = F_x(1)/Mass(1);                                           % Acceleration X (m/s/s)

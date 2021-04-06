@@ -124,7 +124,6 @@ classdef Chemistry
             T_AFT = (sum(mol_mat.*self.hfMat) + sum(mol_mat.*self.CpMat.*(T_mat-self.T_STP)))...
                 / abs(sum(mol_mat(3:end).*self.CpMat(3:end)));
         end
-<<<<<<< HEAD:combustion/SFRJ Internal Ballistics/Chemistry.m
 % ---------------------------------------------------------------------- %
 % Function name: gammaRSolver
 %
@@ -207,11 +206,6 @@ classdef Chemistry
 % Samer Armaly    --------  ---  Initial Creation 
 % ---------------------------------------------------------------------- %   
         function [phi, T_AFT, gamma, R] = phiSolver(self, f, T_air)
-=======
-        
-
-        function [phi, T_AFT] = phiSolver(self, f, T_air)
->>>>>>> f1bb9223acd5578b9b7bb61a399462fc939e2d43:Ramjet Simulator/Combustor/Chemistry.m
             % ----------------- Initialize Values ----------------- % 
             f_yield = f;                        % Actual fuel to air ratio     
             phi = f_yield/self.f_st;

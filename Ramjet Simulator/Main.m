@@ -57,8 +57,8 @@ OxPercent       = 0.2314;                   % Density percentage of oxygen in ai
 %% User Defined Parameters 
 % --------------- Environmental User Defined Parameters --------------- %
 
-flight_mach(1)  = 2.5;                      % Booster max mach
-altitude(1)     = 3000;                     % Initial altitude for ramjet start (m)
+flight_mach(1)  = 3;                      % Booster max mach
+altitude(1)     = 1000;                     % Initial altitude for ramjet start (m)
 c_d             = 0.23;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)
 gamma_atm       = 1.4;                      % Specific heat ratio
@@ -81,17 +81,18 @@ FuelMass(1)     = FuelRho*FuelVol(1);                   % Grain fuel mass, insta
 InltD           = 1.4 / In2Mtr;            % Diameter of Combustor inlet (m)
 InltArea        = pi*InltD^2*(1/4);         % Area of inlet (m)
 gamma_Inlt      = 1.3845;                   % Specific heat ratio of air 
-Area_intake     = 0.001;               % Area of throat (m^2) - Drives mass flow rate through intake
+Area_intake     = 0.0007;                    % Area of throat (m^2) - Drives mass flow rate through intake
 radius_combustor= InltD/2;                  % Radius of the combustor inlet (m)
 Area_combustor  = pi*radius_combustor^2;    % Area of the combustor inlet (m^2)
-def             = 15;                       % Deflection angle (deg)
+def             = 7;                       % Deflection angle (deg)
 gamma           = 1.4;                      % Specific heat ratio (atm)
 
 % ----------------------------- Nozzle ----------------------------- %
 
-NzlThrtDia      = 1.8 /In2Mtr;              % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
-NzlAT           = pi*(NzlThrtDia/2)^2;      % Throat area (m^2)
-NzlARatio       = 1.6;                      % Nozzle expansion ratio
+NzlThrtDia = 1.8 /In2Mtr;              % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
+nozzle.Area_throat = pi*(NzlThrtDia)^2/4;      % Throat area (m^2)
+nozzle.Area_exit = pi*(2.75/In2Mtr)^2/4;  % nozzle exit area (m^2)
+% NzlARatio       = 1.6;                      % Nozzle expansion ratio
 
 % --------------- Chemistry User Defined Parameters ---------------- %
 
@@ -110,10 +111,12 @@ mass(1)         = dry_mass + FuelMass(1);                                   % Ma
 weight(1)       = gravity*mass(1);                                          % Weight of Vehicle
 acceleration(1) = (Thrustdlvd(1) - drag(1) - weight(1))/ mass(1);           % Initial Acceleration
 
+
 % ----------------- Commence Ramjet Simulation  -------------------- %
 
 while StopBurn == 0
     BurnTime(n) = time;                         % Simulation Time
+    
       
     Intake                                      % Call Intake Model
     CombustionChamber                           % Call Combustion Chamber Model

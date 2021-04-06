@@ -33,7 +33,6 @@ gamma_t(n-1)        = 0.0;
 TotallImp(n-1)      = 0.0;
 
 fprintf('Simulation Complete \n')
-fprintf('Elapsed Simulation Time:')
 
 figure('Name','O/F Ratio')
 plot(BurnTime(1:index-1),OFRatio(1:index-1))
@@ -169,5 +168,4 @@ fprintf('Average O/F Ratio:          %.2f  \n',mean(OFRatio))
 fprintf('Average Equivalence Ratio:  %.2f  \n',mean(phi_eqv))
 fprintf('Average Gamma Ratio:        %.2f  \n',mean(gamma_t))
 fprintf('--------------------------------------------\n')
-
-
+toc

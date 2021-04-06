@@ -26,18 +26,25 @@ if (n > 1)
     Vel_x(n)  = Acc_x(n)*SFRJDt + Vel_x(n-1);                               % Velocity X (m/s)
     Vel_z(n)  = Acc_z(n)*SFRJDt + Vel_z(n-1);                               % Velocity Z (m/s)
     Vel(n)    = sqrt(Vel_x(n)^2 + Vel_z(n)^2);                              % Total Velocity (m/s)
+    Vel_t(n)  = sqrt((2*Mass(n-1)*gravity)/(c_d*Rho_a(n-1)*S));             % Terminal Velocity (m/s)
     X_pos(n)  = 0.5*Acc_x(n)*SFRJDt^2 + Vel_x(n-1)*SFRJDt + X_pos(n-1);     % Downrange Position of Vehicle (m)
     Z_pos(n)  = 0.5*Acc_z(n)*SFRJDt^2 + Vel_z(n-1)*SFRJDt + Z_pos(n-1);     % Altitude Postion of Vehicle (m) 
     Rho_a(n)  = interp1(GRAM.Hgtkm, GRAM.DensMean, (Z_pos(n))/1e3);         % Interpolated Lookup Table, atm density 
     Temp_a(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (Z_pos(n))/1e3);            % Interpolated Lookup Table, atm temp
     F_d(n)    = 0.5*Rho_a(n)*c_d*S*Vel(n)^2;                                % Drag (N)
-    F_dx(n)   = F_d(n)*cosd(alpha);                                         % Drag X (N)
-    F_dz(n)   = F_d(n)*sind(alpha);                                         % Drag Z (N)
+    F_dx(n)   = abs(0.5*Rho_a(n)*c_d*S*Vel(n)*Vel_x(n));                    % Drag X (N)
+    F_dz(n)   = abs(0.5*Rho_a(n)*c_d*S*Vel(n)*Vel_z(n));                    % Drag Z (N)
     Mach_f(n) = Vel(n)/sqrt(k*R*Temp_a(n));                                 % Vehicle Mach
     Mass(n)   = dry_mass + FuelMass(n);                                     % Vehicle Mass
     Weight(n) = gravity*Mass(n);                                            % Vehicle weight
     pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (Z_pos(n))/1e3);   % Interpolated Lookup Table, atm pressure
     pressure_atm(n) = pressure_atm(n)/Pa2kPa;                               % Convert to Kpa
+    
+%     if Burnout == 1
+%        if Vel_z(n) < -1*Vel_t(n)
+%           Vel_z(n) = -1*Vel_t(n);
+%        end
+%     end
     
     if F_x(n-1) < 0.0 || F_z(n-1) < 0.0
         F_net(n-1)= -1*sqrt(F_x(n-1)^2 + F_z(n-1)^2);                       % Net Force (N)
@@ -51,17 +58,5 @@ if (n > 1)
         StopBurn = true;
     end
     
-    
-    
-%     Vel(n) = Vel(n-1) + acceleration(n-1)*(SFRJDt);                               % Velocity (m/s)
-%     altitude(n) = altitude(n-1) + Vel(n-1)*SFRJDt + 0.5*acceleration(n-1)*SFRJDt^2;    % Altitude (m)
-%     pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(n))/1e3);                % Interpolated Lookup Table, atm pressure
-%     Temp_a(n) = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(n))/1e3);                         % Interpolated Lookup Table, atm temp
-%     pressure_atm(n) = pressure_atm(n)/Pa2kPa;                                               % Convert to Kpa
-%     Mach_f(n) = Vel(n)/sqrt(k*R*Temp_a(n));                                            % Vehicle Mach
-%     drag(n) = c_d*0.5*Rho_atm(n)*Vel(n)^2*S;                                           % Vehicle drag force
-%     mass(n) = dry_mass + FuelMass(n);                                                       % Vehicle mass
-%     weight(n) = gravity*mass(n);                                                            % Vehicle weight
-%     acceleration(n) = (Thrustdlvd2(n-1) - drag(n-1) - weight(n-1))/ mass(n-1);              % Vehicle acceleration
 end
 

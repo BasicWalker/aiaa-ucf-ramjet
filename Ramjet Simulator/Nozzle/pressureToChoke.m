@@ -7,6 +7,6 @@ end
 if ~exist('R','var')
     R = 287;
 end
-StagPressure = Massflow*sqrt(StagTemp)/Area_throat*sqrt(R/gamma)*((gamma+1)/2)^((gamma+1)/(2*(gamma-1)));
+StagPressure = Massflow*sqrt(StagTemp)/Area_throat/sqrt(gamma/R)/((gamma+1)/2)^(-(gamma+1)/(2*(gamma-1)));
 end
 

@@ -46,9 +46,9 @@ intake.Astar(2,n) = intake.Area_enter/intake.A_Astar(2,n);  % reference area bef
 
 intake.massFlow(2,n) = intake.staticDens(2,n)*intake.Area_enter*intake.velocity(2,n);  % air mass flow at intake opening <kg/s>
 if n < 2
-    intake.chokeStagPres(n) = pressureToChoke(intake.massFlow(2,n), intake.Area_enter, intake.stagTemp(2,n));  % no stag temp change from combustion
+    intake.chokeStagPres(n) = pressureToChoke(intake.massFlow(2,n), nozzle.Area_throat, intake.stagTemp(2,n));  % no stag temp change from combustion
 else
-    intake.chokeStagPres(n) = pressureToChoke(intake.massFlow(2,n), intake.Area_enter, combustion.stagTemp(2,n-1));  % choke pressure using previous AFT
+    intake.chokeStagPres(n) = pressureToChoke(intake.massFlow(2,n), nozzle.Area_throat, combustion.stagTemp(2,n-1));  % choke pressure using previous AFT
 end
 
 % we need to accelerate until normal shock location to make the mass flow

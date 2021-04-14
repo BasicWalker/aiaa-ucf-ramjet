@@ -57,7 +57,7 @@ OxPercent       = 0.2314;                   % Density percentage of oxygen in ai
 %% User Defined Parameters 
 % --------------- Environmental User Defined Parameters --------------- %
 
-flight_mach(1)  = 3;                      % Booster max mach
+flight_mach(1)  = 2;                      % Booster max mach
 altitude(1)     = 1000;                     % Initial altitude for ramjet start (m)
 c_d             = 0.23;                     % Drag coefficient (0.35)
 S               = 0.008119;                 % Frontal surface area (m^2)

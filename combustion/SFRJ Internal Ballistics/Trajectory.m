@@ -20,7 +20,7 @@ if (n > 1)
     F_tx(n-1) = F_t(n-1)*cosd(alpha);                                       % Thrust X (N)
     F_tz(n-1) = F_t(n-1)*sind(alpha);                                       % Thrust Z (N)
     F_x(n-1)  = F_tx(n-1) - F_dx(n-1);                                      % Sum of Force X (N)
-    F_z(n-1)  = F_tz(n-1) - F_dz(n-1);% - Mass(n-1)*gravity;                  % Sum of Force Y (N)
+    F_z(n-1)  = F_tz(n-1) - F_dz(n-1) - Mass(n-1)*gravity + Lift(n-1);      % Sum of Force Y (N)
     Acc_x(n)  = F_x(n-1)/Mass(n-1);                                         % Acceleration X (m/s/s)
     Acc_z(n)  = F_z(n-1)/Mass(n-1);                                         % Acceleration Z (m/s/s)
     Vel_x(n)  = Acc_x(n)*SFRJDt + Vel_x(n-1);                               % Velocity X (m/s)
@@ -37,6 +37,7 @@ if (n > 1)
     Mach_f(n) = Vel(n)/sqrt(k*R*Temp_a(n));                                 % Vehicle Mach
     Mass(n)   = dry_mass + FuelMass(n);                                     % Vehicle Mass
     Weight(n) = gravity*Mass(n);                                            % Vehicle weight
+    Lift(n)   = Mass(n)*gravity*LiftOnOff;
     pressure_atm(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (Z_pos(n))/1e3);   % Interpolated Lookup Table, atm pressure
     pressure_atm(n) = pressure_atm(n)/Pa2kPa;                               % Convert to Kpa
     

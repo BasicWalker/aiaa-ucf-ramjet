@@ -10,11 +10,6 @@
 % Karam Paul      04/26/21  000  Initial Creation 
 % ---------------------------------------------------------------------- %    
 
-RegressionRate                              % Call Regression Rate Model
-GrainGeometry                               % Call Instantaneous Grain Geometry Model
-Gas                                         % Call Gas Model (And Chemistry Model)
-BoundaryLayer                               % Call Boundary Layer Model
-
 % calculate the expansion for step height
 % cmbmach2*GrainID(n) = InltD
 

@@ -1,134 +1,136 @@
-% ------ SFRJ Internal Ballistic Simulator / UCF CAPSTONE PROJECT ------ %
-% File Name: Main.m 
+% ---------- SFRJ Numerical Simulation / UCF CAPSTONE PROJECT ---------- %
+% Program Name:  SFRJ Internal Ballistic Simulatior
 %
-% File Description: 
-% Main executive model. controls logic of the program
+% Program Description: 
+% This program models and simulates critical performance parameters of a 
+% Solif-Fuel Ramjet. 
 % 
+% File Description:
+% Main executive file.  
+%
 % Name            Date      SCR  Description
 % --------------  --------  ---  ------------------------------
 % Ethan Sherlock  01/22/21  000  Initial creation 
-% Ethan Sherlock  02/14/21  001  Chamber pressure calculation update
-% Ethan Sherlock  02/14/21  005  1DOF trajectory update
-% Ethan Sherlock  03/17/21  ---  Code Clean Up
-% ---------------------------------------------------------------------- %
-
-% ------ SFRJ Internal Ballistic Simulator / UCF CAPSTONE PROJECT ------ %
-% Program Name:  SFRJ Internal Ballistic Simulatior
-% 
-% Program Description: 
-% First order approximation of the performance 
-% capabilities of a solid fuel ramjet
-% 
-% File Name: StartUp_Ramjet.m 
-% 
-% File Description: 
-% Main executable file for the SFRJ Internal Ballistic Simulator. Defines
-% user parameters and initializes key variables
-% 
-% Name            Date      SCR  Description
-% --------------  --------  ---  ------------------------------
-% Ethan Sherlock  01/22/21  000  Initial Creation 
-% Ethan Sherlock  02/14/21  005  Add 1DOF Trajectory Initialization
-% Ethan Sherlock  03/12/21  ---  Add Intake Initialization  
-% 
+% Ethan Sherlock  02/14/21  005  1DOF Trajectory Initialization
+% Samer & karam   --------  ---  Sim Revamp
+% Ethan Sherlock  04/14/21  ---  2DOF Trajectory Update
 % ---------------------------------------------------------------------- %
 clear; clc; close all;
+tic
 % ------------------------- Import Tables ------------------------- %
 
-if exist('GRAM','var')==0                      % GRAM atmospheric model
+if exist('GRAM','var')==0                                   % GRAM atmospheric model
     load GRAM_Model.mat                     
 end
 
 % --------------------- Initialize Variables ---------------------- %
 
-SFRJDt          = 1/100;                    % Simulation rate (Hz) 
-n               = 1;                        % Initialize counter
-time            = 0.0;                      % Initialize time (s)
-BurnTime(1)     = 0.0;                      % Initialize BurnTime variable (s)
-StopBurn        = false;                    % Burn status flag (boolean) 
-gravity         = 9.81;                     % gravitation acceleration constant (m/s^2)
-In2Mtr          = 39.3701;                  % Inch to meter converstion 
-Bar2kPa         = 100.0;                    % Bar to kPa conversion
-Pa2kPa          = 1000.0;                   % Pa to Kpa
-C2K             = 273.15;                   % Celcius to Kelvin conversion
-R               = 287.05;                   % Universal Gas Constant for air
-OxPercent       = 0.2314;                   % Density percentage of oxygen in air by mass
+SFRJDt              = 1/100;                                % Simulation rate (Hz) 
+n                   = 1;                                    % Initialize counter
+time                = 0.0;                                  % Initialize time (s)
+BurnTime(1)         = 0.0;                                  % Initialize BurnTime variable (s)
+StopBurn            = false;                                % Burn status flag (boolean) 
+Burnout             = false;                                % Burn out status flag (boolean)
+gravity             = 9.81;                                 % gravitation acceleration constant (m/s^2)
+In2Mtr              = 39.3701;                              % Inch to meter converstion 
+Bar2kPa             = 100.0;                                % Bar to kPa conversion
+Pa2kPa              = 1000.0;                               % Pa to Kpa
+C2K                 = 273.15;                               % Celcius to Kelvin conversion
+R                   = 287.05;                               % Universal Gas Constant for air
+OxPercent           = 0.2314;                               % Density percentage of oxygen in air by mass
 
-%% User Defined Parameters 
-% --------------- Environmental User Defined Parameters --------------- %
+% User Defined Parameters 
+% ------------------ Environmental Initialization ------------------ %
 
-flight_mach(1)  = 2;                      % Booster max mach
-altitude(1)     = 1000;                     % Initial altitude for ramjet start (m)
-c_d             = 0.23;                     % Drag coefficient (0.35)
-S               = 0.008119;                 % Frontal surface area (m^2)
-gamma_atm       = 1.4;                      % Specific heat ratio
-dry_mass        = 6.80389;                  % Mass of ramjet without fuelgrain (kg)
+Mach_f(1)           = 2.0;                                  % Booster max mach
+altitude(1)         = 1000.0;                               % Initial altitude for ramjet start (m)
+c_d                 = 0.23;                                 % Drag coefficient (0.35)
+S                   = 0.008119;                             % Frontal surface area (m^2)
+k                   = 1.4;                                  % Specific heat ratio (air)
+dry_mass            = 6.80389;                              % Mass of ramjet without fuelgrain (kg)
 
-% --------------- Fuel Grain User Defined Parameters --------------- %
+% -------------------- Fuel Grain Initialization ------------------- %
 
-GrainOD         =  2.75 /In2Mtr;                        % Grain OD (m)
-GrainID(1)      =  2.00 /In2Mtr;                        % Grain ID (m)
-GrainL          = 15.00 /In2Mtr;                        % Grain Length (m)
-FuelRho         = 1020;                                 % Grain Density (kg/m^3)
-PortArea(1)     = pi*(GrainID(1)^2)*(1/4);              % Fuel Port Area (m^2)
-FuelCS(1)       = pi*(GrainOD^2)*(1/4) - PortArea(1);   % Fuel Grain Crossectional Area (m^2)
-FuelVol(1)      = FuelCS(1) * GrainL;                   % Fuel Grain Volume (m^3)
-FuelSA(1)       = GrainID(1)* pi * GrainL;              % Fuel Grain Surface Area (m^2)
-FuelMass(1)     = FuelRho*FuelVol(1);                   % Grain fuel mass, instantaneous (kg)
+GrainOD             =  2.75 /In2Mtr;                        % Grain OD (m)
+GrainID(1)          =  1.50 /In2Mtr;                        % Grain ID (m)
+GrainL              = 15.00 /In2Mtr;                        % Grain Length (m)
+FuelRho             = 1020;                                 % Grain Density (kg/m^3)
+PortArea(1)         = pi*(GrainID(1)^2)*(1/4);              % Fuel Port Area (m^2)
+FuelCS(1)           = pi*(GrainOD^2)*(1/4) - PortArea(1);   % Fuel Grain Crossectional Area (m^2)
+FuelVol(1)          = FuelCS(1) * GrainL;                   % Fuel Grain Volume (m^3)
+FuelSA(1)           = GrainID(1)* pi * GrainL;              % Fuel Grain Surface Area (m^2)
+FuelMass(1)         = FuelRho*FuelVol(1);                   % Grain fuel mass, instantaneous (kg)
+Mass(1)             = dry_mass + FuelMass(1);               % Mass of Vehicle (Kg)
 
-% ----------------- Intake User Defined Parameters ----------------- %
+% ---------------------- Intake Initialization --------------------- %
 
-InltD           = 1.4 / In2Mtr;            % Diameter of Combustor inlet (m)
-InltArea        = pi*InltD^2*(1/4);         % Area of inlet (m)
-gamma_Inlt      = 1.3845;                   % Specific heat ratio of air 
-Area_intake     = 0.0007;                    % Area of throat (m^2) - Drives mass flow rate through intake
-radius_combustor= InltD/2;                  % Radius of the combustor inlet (m)
-Area_combustor  = pi*radius_combustor^2;    % Area of the combustor inlet (m^2)
-def             = 7;                       % Deflection angle (deg)
-gamma           = 1.4;                      % Specific heat ratio (atm)
+InltD               = 1.4 / In2Mtr;                         % Diameter of Combustor inlet (m)
+InltArea            = pi*InltD^2*(1/4);                     % Area of inlet (m)
+gamma_Inlt          = 1.3845;                               % Specific heat ratio of air 
+Area_intake         = 0.0007;                               % Area of throat (m^2) - Drives mass flow rate through intake
+radius_combustor    = InltD/2;                              % Radius of the combustor inlet (m)
+Area_combustor      = pi*radius_combustor^2;                % Area of the combustor inlet (m^2)
+def                 = 7;                                    % Deflection angle (deg)
+gamma               = 1.4;                                  % Specific heat ratio (atm)
 
-% ----------------------------- Nozzle ----------------------------- %
+% ---------------------- Nozzle Initialization --------------------- %
 
-NzlThrtDia = 1.8 /In2Mtr;              % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
-nozzle.Area_throat = pi*(NzlThrtDia)^2/4;      % Throat area (m^2)
-nozzle.Area_exit = pi*(2.75/In2Mtr)^2/4;  % nozzle exit area (m^2)
-% NzlARatio       = 1.6;                      % Nozzle expansion ratio
+NzlThrtDia          = 1.8 /In2Mtr;                          % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
+nozzle.Area_throat  = pi*(NzlThrtDia)^2/4;                  % Throat area (m^2)
+nozzle.Area_exit    = pi*(2.75/In2Mtr)^2/4;                 % nozzle exit area (m^2)
+% NzlARatio           = 1.6;                                  % Nozzle expansion ratio
 
 % --------------- Chemistry User Defined Parameters ---------------- %
 
-chem = Chemistry();
+chem = Chemistry();                                         % Initialize Chemistry Model
 
-% ----------------- Trajectory Initial Conditions ------------------ %
-                    
-Rho_atm(1)      = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);    % Atmospheric Density (kg/m^3)
-pressure_atm(1) = interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(1))/1e3);    % Atmospheric Pressure (Pa)
-pressure_atm(1) = pressure_atm(1)*(1/Pa2kPa);                               % Atmospheric Pressure (kPa)
-Temp_atm(1)     = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);       % Atmospheric Temperature (K)
-velocity(1)     = flight_mach(1)*sqrt(gamma_atm*R*Temp_atm(1));             % Atmospheric Velocity (m/s)
-drag(1)         = c_d*0.5*Rho_atm(1)*velocity(1)^2*S;                       % Induced Drag (N)
-Thrustdlvd(1)   = 0.0;                                                      % Initialize First Thrust Value 
-mass(1)         = dry_mass + FuelMass(1);                                   % Mass of Vehicle
-weight(1)       = gravity*mass(1);                                          % Weight of Vehicle
-acceleration(1) = (Thrustdlvd(1) - drag(1) - weight(1))/ mass(1);           % Initial Acceleration
+% ------------------- Trajectory Initialization -------------------- %
 
+alpha                   = 0.0;                                                                  % Launch Angle (deg) - in reference to horizon
+trajectory.LiftOnOff    = 0.0;                                                                  % 0.0 = off; % 1.0 = on
+trajectory.Lift(1)      = Mass(1)*gravity*trajectory.LiftOnOff;                                 % Lift (N)
+trajectory.Rho_a(1)     = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);                % Atmospheric Density (kg/m^3)
+trajectory.pressure_a(1)= interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(1))/1e3);                % Atmospheric Pressure (Pa)
+trajectory.pressure_a(1)= trajectory.pressure_a(1)/Pa2kPa;                                      % Atmospheric Pressure (kPa)
+trajectory.Temp_a(1)    = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);                   % Atmospheric Temperature (K)
+trajectory.Vel(1)       = Mach_f(1)*sqrt(k*R*trajectory.Temp_a(1));                             % Velocity (m/s)
+trajectory.Vel_x(1)     = trajectory.Vel(1)*cosd(alpha);                                        % Velocity X (m/s)
+trajectory.Vel_z(1)     = trajectory.Vel(1)*sind(alpha);                                        % Velocity Z (m/s)
+trajectory.F_d(1)       = 0.5*trajectory.Rho_a(1)*c_d*S*trajectory.Vel(1)^2;                    % Drag (N)
+trajectory.F_dx(1)      = 0.5*trajectory.Rho_a(1)*c_d*S*trajectory.Vel(1)*trajectory.Vel_x(1);  % Drag X (N)
+trajectory.F_dz(1)      = 0.5*trajectory.Rho_a(1)*c_d*S*trajectory.Vel(1)*trajectory.Vel_z(1);  % Drag Z (N)
+thrust.F_t(1)           = 0.0;                                                                  % Thrust (N) 
+thrust.F_tx(1)          = thrust.F_t(1)*cosd(alpha);                                            % Thrust X (N)
+thrust.F_tz(1)          = thrust.F_t(1)*sind(alpha);                                            % Thrust Z (N)
+trajectory.F_x(1)       = thrust.F_tx(1)-trajectory.F_dx(1);                                    % Force X (N)
+trajectory.F_z(1)       = thrust.F_tz(1)-trajectory.F_dz(1)-Mass(1)*gravity+trajectory.Lift(1); % Force Z (N)
+trajectory.F_net(1)     = sqrt(trajectory.F_x(n)^2+trajectory.F_z(n)^2);                        % Force (N)
+trajectory.Acc(1)       = trajectory.F_net(1)/Mass(1);                                          % Acceleration (m/s/s)
+trajectory.Acc_x(1)     = trajectory.F_x(1)/Mass(1);                                            % Acceleration X (m/s/s)
+trajectory.Acc_z(1)     = trajectory.F_z(1)/Mass(1);                                            % Acceleration Z (m/s/s)
+trajectory.X_pos(1)     = 0.0;                                                                  % Initial X Position (m)
+trajectory.Z_pos(1)     = altitude(1);                                                          % Initial Z Position (m)
+trajectory.Vel_t(1)     = sqrt((2*Mass(1)*gravity)/(c_d*trajectory.Rho_a(1)*S));                % Terminal Velocity (m/s)
 
-% ----------------- Commence Ramjet Simulation  -------------------- %
+% -------------------- Commence Ramjet Simulation  --------------------- %
 
 while StopBurn == 0
-    BurnTime(n) = time;                         % Simulation Time
-    
-      
-    Intake                                      % Call Intake Model
-    CombustionChamber                           % Call Combustion Chamber Model
-    Nozzle                                      % Call Nozzle Model
-    Thrust                                      % Call Thrust Model
-    if StopBurn == 1                            % Do not update trajectory since fuel is depleted
-        break
+    BurnTime(n) = time;                                     % Simulation Time 
+    if Burnout == 0
+        RegressionRate                                      % Call Regression Rate Model
+        GrainGeometry                                       % Call Instantaneous Grain Geometry Model
+        Trajectory                                          % Call Trajectory Model
+        Intake                                              % Call Intake Model
+        Gas                                                 % Call Gas Model (And Chemistry Model)  
+        CombustionChamber                                   % Call Combustion Chamber Model
+        Nozzle                                              % Call Nozzle Model
+        Thrust                                              % Call Thrust Model 
+        MessageFile                                         % Call Message Outputs
+    else
+        Trajectory                                          % Call Trajectory Model
+        MessageFile                                         % Call Message Outputs        
     end
-    Trajectory                                  % Call Trajectory Model
-   
-    time = time + SFRJDt;                       % Step through simulation time
-    n = n + 1;
+    time = time + SFRJDt;                                   % Step through simulation time
+    n = n + 1;                                              % Increase Index
 end
-
-PlotData                                        % Plot Simulation Results
+PlotData                                                    % Plot Simulation Results

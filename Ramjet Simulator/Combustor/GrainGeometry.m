@@ -24,16 +24,9 @@ MFuelGen(n) = RgrsPerStp*FuelRho*FuelSA(n);         % Fuel mass generated every 
 MdotFuel(n) = MFuelGen(n)/SFRJDt;                   % Fuel mass flow rate (kg/s)
 FuelMass(n) = FuelRho*FuelVol(n);                   % Grain fuel mass, instantaneous (kg)
 
-% Estimate Simulation Run Time
-MaxSimSteps = (GrainOD/2 - GrainID(1)/2)/RgrsPerStp + 1;
-Status = (n/MaxSimSteps)*100;
-if Status > 100
-    Status = 100;
-end
-fprintf('Running... %.2f%%\n',Status)               % Running Simulator indicator
-
 % Stop Simulation Flag
 if GrainID(n) > GrainOD
     StopBurn = true;
-    fprintf('Fuel Depleted\n')
+    Burnout = true;
+    index = n;
 end

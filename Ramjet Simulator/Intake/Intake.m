@@ -8,6 +8,7 @@
 % Name               Date      SCR  Description
 % -----------------  --------  ---  ------------------------------
 % Durlak & Aubertin  01/22/21  ---  Initial Creation 
+% Samer Armaly       --------  ---  Sim Revamp
 % ---------------------------------------------------------------------- %
 
 % Station definitions used for indices
@@ -19,10 +20,10 @@
 intake.Area_enter =  Area_intake;
 
 % Station 1 properties (free-stream)-----
-intake.mach(1,n) = flight_mach(n);
-intake.staticPres(1,n) = pressure_atm(n)*1e3;  % <Pa>
-intake.staticDens(1,n) = Rho_atm(n);  % <kg/m^3>   
-intake.staticTemp(1,n) = Temp_atm(n);  % <K> 
+intake.mach(1,n) = Mach_f(n);
+intake.staticPres(1,n) = trajectory.pressure_a(n)*1e3;  % <Pa>
+intake.staticDens(1,n) = trajectory.Rho_a(n);  % <kg/m^3>   
+intake.staticTemp(1,n) = trajectory.Temp_a(n);  % <K> 
 [~, intake.tempRatio(1,n), intake.presRatio(1,n), intake.densRatio(1,n), ~] = flowisentropic(gamma, intake.mach(1,n), 'mach');  % ratios are static over stagnation
 intake.stagTemp(1,n) = intake.staticTemp(1,n)/intake.tempRatio(1,n);  % <K>                                                 
 intake.stagPres(1,n) = intake.staticPres(1,n)/intake.presRatio(1,n);  % <Pa>                                                 

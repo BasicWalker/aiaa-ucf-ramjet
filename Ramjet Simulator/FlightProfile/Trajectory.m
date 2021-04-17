@@ -41,7 +41,7 @@ trajectory.F_dx(n+1)  = abs(0.5*trajectory.Rho_a(n)*vehicle.DragCoeff*vehicle.Fr
 trajectory.F_dz(n+1)  = abs(0.5*trajectory.Rho_a(n)*vehicle.DragCoeff*vehicle.FrontSurfArea*trajectory.Vel_z(n)^2);     % Drag Z (N)
 vehicle.Mach(n+1) = trajectory.Vel_mag(n)/sqrt(constants.gamma*constants.R*trajectory.Temp_a(n));                                       % Vehicle Mach
 vehicle.TotalMass(n+1)   = vehicle.DryMass + fuel.Mass(n);                                                                 % Vehicle Mass
-Weight(n+1) = constants.gravity*vehicle.TotalMass(n);                                                                        % Vehicle weight
+vehicle.Weight(n+1) = constants.gravity*vehicle.TotalMass(n);                                                                        % Vehicle weight
 trajectory.Lift(n+1)   = vehicle.TotalMass(n)*constants.gravity*trajectory.LiftOnOff;                                        % Lift (N) - equal to weight of vehicle
 
 % Stop simulation *crash*

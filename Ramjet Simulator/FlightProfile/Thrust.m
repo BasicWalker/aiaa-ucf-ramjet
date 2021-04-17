@@ -30,7 +30,7 @@
 % SpeedSound_exit(n) = sqrt(nozzle.gamma(n)*R*Temp_exit(n));
 % Velocity_exit(n) = Mach_exit(n) * SpeedSound_exit(n);
 % Thrustdlvd2(n) = MdotAir(n) * ((1 + combustion.FAR(n))*Velocity_exit(n) - v_2(n));
-thrust.F_t(n) = nozzle.massFlow(2,n)*nozzle.velocity(2,n) - (intake.massFlow(2,n)*intake.velocity(2,n));
+thrust(n) = nozzle.massFlow(2,n)*nozzle.velocity(2,n) - (intake.massFlow(2,n)*intake.velocity(2,n));
 
-Impulse(n) = thrust.F_t(n)*SFRJDt;         % Impulse delivered
+Impulse(n) = thrust(n)*SFRJDt;         % Impulse delivered
 TotallImp(n) = sum(Impulse(:));             % Total Impulse

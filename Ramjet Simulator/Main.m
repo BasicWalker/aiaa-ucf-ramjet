@@ -86,6 +86,7 @@ nozzle.Area_exit    = pi*(2.75/In2Mtr)^2/4;                 % nozzle exit area (
 chem = Chemistry();                                         % Initialize Chemistry Model
 
 % ------------------- Trajectory Initialization -------------------- %
+thrust(1)               = 0.0;                                                                  % Thrust (N) 
 alpha                   = 0.0;                                                                  % Launch Angle (deg) - in reference to horizon
 trajectory.LiftOnOff    = 0.0;                                                                  % 0.0 = off; % 1.0 = on
 trajectory.Lift(1)      = Mass(1)*gravity*trajectory.LiftOnOff;                                 % Lift (N)
@@ -98,11 +99,10 @@ trajectory.Vel_z(1)     = trajectory.Vel(1)*sind(alpha);                        
 trajectory.F_d(1)       = 0.5*trajectory.Rho_a(1)*c_d*S*trajectory.Vel(1)^2;                    % Drag (N)
 trajectory.F_dx(1)      = 0.5*trajectory.Rho_a(1)*c_d*S*trajectory.Vel(1)*trajectory.Vel_x(1);  % Drag X (N)
 trajectory.F_dz(1)      = 0.5*trajectory.Rho_a(1)*c_d*S*trajectory.Vel(1)*trajectory.Vel_z(1);  % Drag Z (N)
-thrust.F_t(1)           = 0.0;                                                                  % Thrust (N) 
-thrust.F_tx(1)          = thrust.F_t(1)*cosd(alpha);                                            % Thrust X (N)
-thrust.F_tz(1)          = thrust.F_t(1)*sind(alpha);                                            % Thrust Z (N)
-trajectory.F_x(1)       = thrust.F_tx(1)-trajectory.F_dx(1);                                    % Force X (N)
-trajectory.F_z(1)       = thrust.F_tz(1)-trajectory.F_dz(1)-Mass(1)*gravity+trajectory.Lift(1); % Force Z (N)
+trajectory.F_tx(1)      = thrust(1)*cosd(alpha);                                            % Thrust X (N)
+trajectory.F_tz(1)      = thrust(1)*sind(alpha);                                            % Thrust Z (N)
+trajectory.F_x(1)       = trajectory.F_tx(1)-trajectory.F_dx(1);                                    % Force X (N)
+trajectory.F_z(1)       = trajectory.F_tz(1)-trajectory.F_dz(1)-Mass(1)*gravity+trajectory.Lift(1); % Force Z (N)
 trajectory.F_net(1)     = sqrt(trajectory.F_x(n)^2+trajectory.F_z(n)^2);                        % Force (N)
 trajectory.Acc(1)       = trajectory.F_net(1)/Mass(1);                                          % Acceleration (m/s/s)
 trajectory.Acc_x(1)     = trajectory.F_x(1)/Mass(1);                                            % Acceleration X (m/s/s)
@@ -118,16 +118,16 @@ while StopBurn == 0
     if Burnout == 0
         RegressionRate                                      % Call Regression Rate Model
         GrainGeometry                                       % Call Instantaneous Grain Geometry Model
-        Trajectory                                          % Call Trajectory Model
         Intake                                              % Call Intake Model
         Gas                                                 % Call Gas Model (And Chemistry Model)  
         CombustionChamber                                   % Call Combustion Chamber Model
         Nozzle                                              % Call Nozzle Model
         Thrust                                              % Call Thrust Model 
-        MessageFile                                         % Call Message Outputs
-    else
+        if StopBurn == 1  % do not update trajectory since fuel is depleted
+            break
+        end
         Trajectory                                          % Call Trajectory Model
-        MessageFile                                         % Call Message Outputs        
+        MessageFile                                         % Call Message Outputs       
     end
     time = time + SFRJDt;                                   % Step through simulation time
     n = n + 1;                                              % Increase Index

@@ -12,31 +12,31 @@
 % Ethan Sherlock  03/12/21  002  Chem model update
 % Ethan Sherlock  04/14/21  ---  2DOF model update
 % ---------------------------------------------------------------------- %
-% thrust.F_t(n-1)         = trajectory.F_t(n-2);
-PC(n-1)                 = 0.0;
-combustion.OFRatio(n-1)            = 0.0;
-intake.staticPres(end,n-1)           = 0.0;
-PCreq(n-1)              = 0.0;
-PC_TAFT(n-1)            = 0.0;
-trajectory.F_d(n-1)     = trajectory.F_d(n-2);
-trajectory.Vel(n-1)     = 0.0;
-trajectory.Acc(n-1)     = 0.0;
-trajectory.F_net(n-1)   = trajectory.F_net(n-2);
-MassFlow(n-1)           = 0.0;
-MdotAir(n-1)            = 0.0;
-fuel.MassFlow(n-1)           = 0.0;
-InltPres_stag(n-1)      = 0.0;
-PCreq(n-1)              = 0.0;
-PC_TAFT(n-1)            = 0.0;
-combustion.Phi(n-1)            = 0.0;
-T_AFT(n-1)             = 0.0;
-nozzle.gamma(n-1)            = 0.0;
-TotallImp(n-1)          = 0.0;
+% thrust(n-1)         = trajectory.F_t(n-2);
+% PC(n-1)                 = 0.0;
+% combustion.OFRatio(n-1)            = 0.0;
+% intake.staticPres(end,n-1)           = 0.0;
+% PCreq(n-1)              = 0.0;
+% PC_TAFT(n-1)            = 0.0;
+% trajectory.F_d(n-1)     = trajectory.F_d(n-2);
+% trajectory.Vel(n-1)     = 0.0;
+% trajectory.Acc(n-1)     = 0.0;
+% trajectory.F_net(n-1)   = trajectory.F_net(n-2);
+% MassFlow(n-1)           = 0.0;
+% MdotAir(n-1)            = 0.0;
+% fuel.MassFlow(n-1)           = 0.0;
+% InltPres_stag(n-1)      = 0.0;
+% PCreq(n-1)              = 0.0;
+% PC_TAFT(n-1)            = 0.0;
+% combustion.Phi(n-1)            = 0.0;
+% T_AFT(n-1)             = 0.0;
+% nozzle.gamma(n-1)            = 0.0;
+% TotallImp(n-1)          = 0.0;
 
 fprintf('Simulation Complete \n')
 
 figure('Name','Force Profiles')
-plot(BurnTime,thrust.F_t,BurnTime,trajectory.F_d, BurnTime, Mass*gravity, BurnTime, trajectory.F_net)
+plot(BurnTime,thrust,BurnTime,trajectory.F_d, BurnTime, Mass*gravity, BurnTime, trajectory.F_net)
 title('Thrust & Drag vs Time')
 xlabel('Time (s)')
 ylabel('Force (N)')
@@ -55,7 +55,7 @@ grid on
 set(gcf,'position',[550,200,800,700])
 
 figure('Name','Force Profile')
-plot(BurnTime,thrust.F_t,BurnTime,trajectory.F_d, BurnTime, Mass*gravity, BurnTime, trajectory.F_net)
+plot(BurnTime,thrust,BurnTime,trajectory.F_d, BurnTime, Mass*gravity, BurnTime, trajectory.F_net)
 title('Thrust & Drag vs Time')
 xlabel('Time (s)')
 ylabel('Force (N)')
@@ -167,7 +167,7 @@ end
 
 fprintf('------------ Simulation Results ------------\n')
 fprintf('Burn Time:                  %.2f    (s)\n', BurnTime(n-1))
-fprintf('Average Thrust:             %.2f   (N)\n', mean(thrust.F_t))
+fprintf('Average Thrust:             %.2f   (N)\n', mean(thrust))
 fprintf('Average Drag Force:         %.2f   (N)\n',mean(trajectory.F_d))
 fprintf('Total Impulse:              %.2f  (Ns)\n', max(TotallImp))
 fprintf('Air Mass Flow Rate:         %.3f    (kg/s)\n', mean(intake.massFlow(end)))

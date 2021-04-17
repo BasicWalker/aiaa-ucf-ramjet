@@ -10,7 +10,7 @@
 % ---------------------------------------------------------------------- %
 
 % Estimate Simulation Run Time
-MaxSimSteps = (GrainOD/2 - GrainID(1)/2)/RgrsPerStp + 1;
+MaxSimSteps = (fuel.DiaOuter/2 - fuel.DiaInner(1)/2)/fuel.Regression + 1;
 Status = 100 - (n/MaxSimSteps)*100;
 if Status > 100
     Status = 100;

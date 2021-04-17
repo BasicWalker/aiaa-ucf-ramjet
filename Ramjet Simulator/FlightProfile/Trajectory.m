@@ -11,7 +11,7 @@
 % Ethan Sherlock  04/03/21  ---  Update to 2DOF
 % ---------------------------------------------------------------------- %
 if Burnout == 1
-    FuelMass(n) = 0.0;
+    fuel.Mass(n) = 0.0;
     F_t(n) = 0.0;
 end
 
@@ -34,11 +34,10 @@ if (n > 1)
     trajectory.F_dx(n)  = abs(0.5*trajectory.Rho_a(n)*c_d*S*trajectory.Vel(n)*trajectory.Vel_x(n));     % Drag X (N)
     trajectory.F_dz(n)  = abs(0.5*trajectory.Rho_a(n)*c_d*S*trajectory.Vel(n)*trajectory.Vel_z(n));     % Drag Z (N)
     Mach_f(n) = trajectory.Vel(n)/sqrt(k*R*trajectory.Temp_a(n));                                       % Vehicle Mach
-    Mass(n)   = dry_mass + FuelMass(n);                                                                 % Vehicle Mass
+    Mass(n)   = dry_mass + fuel.Mass(n);                                                                 % Vehicle Mass
     Weight(n) = gravity*Mass(n);                                                                        % Vehicle weight
     trajectory.Lift(n)   = Mass(n)*gravity*trajectory.LiftOnOff;                                        % Lift (N) - equal to weight of vehicle
-    trajectory.pressure_a(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (trajectory.Z_pos(n))/1e3);           % Interpolated Lookup Table, atm pressure
-    trajectory.pressure_a(n) = trajectory.pressure_a(n)/Pa2kPa;                                         % Convert to Kpa
+    trajectory.pressure_a(n) = interp1(GRAM.Hgtkm, GRAM.PresMean, (trajectory.Z_pos(n))/1e3);           % Interpolated Lookup Table, atm pressure                                       % Convert to Kpa
     
     if trajectory.F_x(n-1) < 0.0 || trajectory.F_z(n-1) < 0.0
         trajectory.F_net(n-1)= -1*sqrt(trajectory.F_x(n-1)^2 + trajectory.F_z(n-1)^2);                  % Net Force (N)

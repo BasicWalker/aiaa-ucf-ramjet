@@ -31,6 +31,7 @@ time                = 0.0;                                  % Initialize time (s
 BurnTime(1)         = 0.0;                                  % Initialize BurnTime variable (s)
 StopBurn            = false;                                % Burn status flag (boolean) 
 Burnout             = false;                                % Burn out status flag (boolean)
+% ------------------        Define Constants     ------------------ %
 gravity             = 9.81;                                 % gravitation acceleration constant (m/s^2)
 In2Mtr              = 39.3701;                              % Inch to meter converstion 
 Bar2kPa             = 100.0;                                % Bar to kPa conversion
@@ -38,60 +39,58 @@ Pa2kPa              = 1000.0;                               % Pa to Kpa
 C2K                 = 273.15;                               % Celcius to Kelvin conversion
 R                   = 287.05;                               % Universal Gas Constant for air
 OxPercent           = 0.2314;                               % Density percentage of oxygen in air by mass
+gamma               = 1.4;                                  % Specific heat ratio (atm)
+k                   = 1.4;                                  % Specific heat ratio (air)
 
 % User Defined Parameters 
 % ------------------ Environmental Initialization ------------------ %
-
 Mach_f(1)           = 2.0;                                  % Booster max mach
 altitude(1)         = 1000.0;                               % Initial altitude for ramjet start (m)
 c_d                 = 0.23;                                 % Drag coefficient (0.35)
 S                   = 0.008119;                             % Frontal surface area (m^2)
-k                   = 1.4;                                  % Specific heat ratio (air)
 dry_mass            = 6.80389;                              % Mass of ramjet without fuelgrain (kg)
 
+% -------------------- Combustor  Initialization ------------------- %
+combustion.InletArea = 0.0064693;%pi*combustion.InletDia^2*(1/4);  % (m)
+combustion.InletDia = sqrt(4*combustion.InletArea/pi);%  <m>   
+combustion.InletDiaINCH = sqrt(4*combustion.InletArea/pi)* In2Mtr;  % <in>    %1.4 / In2Mtr;  % (m)
+combustion.InletGamma = 1.3845;  % Specific heat ratio of air 
+combustion.ChamberArea = combustion.InletArea*1.5;  % 50% larger than inlet area     %pi*combustion.ChamberRadius^2/4; %pi*combustion.ChamberRadius^2;  % Area of combustion chamber (m^2)
+combustion.ChamberDia = sqrt(4*combustion.ChamberArea/pi); %<m>            %2.75 /In2Mtr / 2;  % Radius of the combustion chamber (m)
+combustion.ChamberDiaINCH = sqrt(4*combustion.ChamberArea/pi)* In2Mtr; %<in>
 % -------------------- Fuel Grain Initialization ------------------- %
-
-GrainOD             =  2.75 /In2Mtr;                        % Grain OD (m)
-GrainID(1)          =  1.50 /In2Mtr;                        % Grain ID (m)
-GrainL              = 15.00 /In2Mtr;                        % Grain Length (m)
-FuelRho             = 1020;                                 % Grain Density (kg/m^3)
-PortArea(1)         = pi*(GrainID(1)^2)*(1/4);              % Fuel Port Area (m^2)
-FuelCS(1)           = pi*(GrainOD^2)*(1/4) - PortArea(1);   % Fuel Grain Crossectional Area (m^2)
-FuelVol(1)          = FuelCS(1) * GrainL;                   % Fuel Grain Volume (m^3)
-FuelSA(1)           = GrainID(1)* pi * GrainL;              % Fuel Grain Surface Area (m^2)
-FuelMass(1)         = FuelRho*FuelVol(1);                   % Grain fuel mass, instantaneous (kg)
-Mass(1)             = dry_mass + FuelMass(1);               % Mass of Vehicle (Kg)
+fuel.DiaOuter             =  combustion.ChamberDia;%2.75 /In2Mtr;                        % Grain OD (m)
+fuel.DiaOuterINCH             =  combustion.ChamberDia*In2Mtr;
+fuel.StepHeight(1) = 1/8 /In2Mtr;
+fuel.DiaInner(1)          = 2*fuel.StepHeight(1) + combustion.InletDia;    %1.50 /In2Mtr;   
+fuel.DiaInnerINCH(1)          = (2*fuel.StepHeight(1) + combustion.InletDia)* In2Mtr;    %1.50 /In2Mtr;  % Grain ID (m)
+fuel.Length              = 15.00 /In2Mtr;                        % Grain Length (m)
+fuel.Density             = 1020;                                 % Grain Density (kg/m^3)
+fuel.PortArea(1)         = pi*(fuel.DiaInner(1)^2)*(1/4);              % Fuel Port Area (m^2)
+fuel.CsxArea(1)           = pi*(fuel.DiaOuter^2)*(1/4) - fuel.PortArea(1);   % Fuel Grain Crossectional Area (m^2)
+fuel.Volume(1)          = fuel.CsxArea(1) * fuel.Length;                   % Fuel Grain Volume (m^3)
+fuel.SurfArea(1)           = fuel.DiaInner(1)* pi * fuel.Length;              % Fuel Grain Surface Area (m^2)
+fuel.Mass(1)         = fuel.Density*fuel.Volume(1);                   % Grain fuel mass, instantaneous (kg)
+Mass(1)             = dry_mass + fuel.Mass(1);               % Mass of Vehicle (Kg)
 
 % ---------------------- Intake Initialization --------------------- %
-
-InltD               = 1.4 / In2Mtr;                         % Diameter of Combustor inlet (m)
-InltArea            = pi*InltD^2*(1/4);                     % Area of inlet (m)
-gamma_Inlt          = 1.3845;                               % Specific heat ratio of air 
-Area_intake         = 0.0007;                               % Area of throat (m^2) - Drives mass flow rate through intake
-radius_combustor    = InltD/2;                              % Radius of the combustor inlet (m)
-Area_combustor      = pi*radius_combustor^2;                % Area of the combustor inlet (m^2)
-def                 = 7;                                    % Deflection angle (deg)
-gamma               = 1.4;                                  % Specific heat ratio (atm)
+intake.Area_enter         = 0.0007;                               % Area of throat (m^2) - Drives mass flow rate through intake
+intake.DeflAngle                 = 7;                                    % Deflection angle (deg)
 
 % ---------------------- Nozzle Initialization --------------------- %
-
-NzlThrtDia          = 1.8 /In2Mtr;                          % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
-nozzle.Area_throat  = pi*(NzlThrtDia)^2/4;                  % Throat area (m^2)
+nozzle.DiaThroat          = 1.8 /In2Mtr;                          % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
+nozzle.Area_throat  = pi*(nozzle.DiaThroat)^2/4;                  % Throat area (m^2)
 nozzle.Area_exit    = pi*(2.75/In2Mtr)^2/4;                 % nozzle exit area (m^2)
-% NzlARatio           = 1.6;                                  % Nozzle expansion ratio
 
 % --------------- Chemistry User Defined Parameters ---------------- %
-
 chem = Chemistry();                                         % Initialize Chemistry Model
 
 % ------------------- Trajectory Initialization -------------------- %
-
 alpha                   = 0.0;                                                                  % Launch Angle (deg) - in reference to horizon
 trajectory.LiftOnOff    = 0.0;                                                                  % 0.0 = off; % 1.0 = on
 trajectory.Lift(1)      = Mass(1)*gravity*trajectory.LiftOnOff;                                 % Lift (N)
 trajectory.Rho_a(1)     = interp1(GRAM.Hgtkm, GRAM.DensMean, (altitude(1))/1e3);                % Atmospheric Density (kg/m^3)
 trajectory.pressure_a(1)= interp1(GRAM.Hgtkm, GRAM.PresMean, (altitude(1))/1e3);                % Atmospheric Pressure (Pa)
-trajectory.pressure_a(1)= trajectory.pressure_a(1)/Pa2kPa;                                      % Atmospheric Pressure (kPa)
 trajectory.Temp_a(1)    = interp1(GRAM.Hgtkm, GRAM.Tmean, (altitude(1))/1e3);                   % Atmospheric Temperature (K)
 trajectory.Vel(1)       = Mach_f(1)*sqrt(k*R*trajectory.Temp_a(1));                             % Velocity (m/s)
 trajectory.Vel_x(1)     = trajectory.Vel(1)*cosd(alpha);                                        % Velocity X (m/s)

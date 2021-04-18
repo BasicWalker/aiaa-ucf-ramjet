@@ -16,6 +16,8 @@
 % Ethan Sherlock  04/14/21  ---  2DOF Trajectory Update
 % ---------------------------------------------------------------------- %
 clear; clc; close all;
+addpath(genpath(pwd))
+addpath('..\Common Resources')
 tic
 % Import data
 load RamjetDimensions.mat  % load in the ramjet design

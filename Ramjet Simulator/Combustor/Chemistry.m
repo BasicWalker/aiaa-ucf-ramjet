@@ -189,7 +189,7 @@ classdef Chemistry
             m_Cvp = (maf_H2O*Cv_H2O) + (maf_CO2*Cv_CO2) + (maf_N2*Cv_N2) + (maf_O2*Cv_O2) + (maf_ABS*Cv_ABS);
             
             % Gas constant (R) of products
-            R = (maf_H2O*R_H2O) + (maf_CO2*R_CO2) + (maf_N2*R_N2) + (maf_O2*R_O2) + (maf_ABS*R_ABS);
+            R = ((maf_H2O*R_H2O) + (maf_CO2*R_CO2) + (maf_N2*R_N2) + (maf_O2*R_O2) + (maf_ABS*R_ABS))*1e3;  % j/(kg*K)
             
             % Specific Heat Ratio
             gamma = m_Cpp/m_Cvp;

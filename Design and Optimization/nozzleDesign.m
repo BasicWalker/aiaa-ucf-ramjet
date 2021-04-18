@@ -50,18 +50,18 @@ in2m = 0.0254;
 
 % Iterate on altitude
 altStep = 1000;
-min_alt = 5000;
+min_alt = 1000;
 max_alt = 30000;
 
 % Iterate on Air Mass Flow Rate
 airMassFlowStep = 0.01;
 min_airMassFlow = 0.5;
-max_airMassFlow = 2;
+max_airMassFlow = 3;
 
 % Iterate on Throat Area <in>
 throatDiameterStep = 0.1;
 min_throatDiameter = 0.5; 
-max_throatDiameter = 1.5;
+max_throatDiameter = 2.5;
 
 % Array Sizes 
 l = ((max_alt - min_alt) / altStep) + 1;
@@ -102,7 +102,7 @@ idealThrust     = zeros(m,n);
 %% Begin Interation 1
     % Need to iterate on intake designs to understand achievable stagnation pressures
 intake_mach         = 2;
-intake_deflection   = 10;
+intake_deflection   = 15;
 for i = 1:l
     altitude(i) = min_alt + altStep*(i-1);
     
@@ -181,7 +181,7 @@ if plotFlag == 1
     mesh(X, Y, chamberPres)
     xlabel('Air Mass Flow Rate <kg/s>')
     ylabel('Throat Diameter <in>')
-    zlabel('Minimum Chamber Pressure to Choke');
+    zlabel('Minimum Chamber Pressure to Choke < Pa >');
     
     c = phi(:,1);
     d = throatDiameter_in(1,:);
@@ -190,7 +190,7 @@ if plotFlag == 1
     mesh(X, Y, chamberPres)
     xlabel('Equivalence Ratio')
     ylabel('Throat Diameter <in>')
-    zlabel('Minimum Chamber Pressure to Choke');
+    zlabel('Minimum Chamber Pressure to Choke < Pa >');
     
     
 end

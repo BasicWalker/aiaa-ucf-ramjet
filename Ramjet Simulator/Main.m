@@ -16,6 +16,8 @@
 % Ethan Sherlock  04/14/21  ---  2DOF Trajectory Update
 % ---------------------------------------------------------------------- %
 clear; clc; close all;
+addpath(genpath(pwd))
+addpath('..\Common Resources')
 tic
 % Import data
 load RamjetDimensions.mat  % load in the ramjet design
@@ -33,7 +35,7 @@ Burnout             = false;                                % Burn out status fl
 vehicle.Mach(1)         = 2.5;  % Ramjet Initial Mach number
 trajectory.Z_pos(1)     = 1000.0;  % Initial altitude for ramjet start (m)
 alpha                   = 0.0;  % Launch Angle (deg) - in reference to horizon
-trajectory.LiftOnOff    = 0.0;  % 0.0 = off; % 1.0 = on
+trajectory.LiftOnOff    = 1;  % 0.0 = off; % 1.0 = on
 
 % -------------------- Commence Ramjet Simulation  --------------------- %
 Initialize  % set initial conditions
@@ -56,4 +58,5 @@ while StopBurn == 0
     time = time + SFRJDt;                                   % Step through simulation time
     n = n + 1;                                              % Increase Index
 end
+clear gamma R
 PlotData                                                    % Plot Simulation Results

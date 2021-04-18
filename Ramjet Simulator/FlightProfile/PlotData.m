@@ -42,7 +42,7 @@ grid on
 set(gcf,'position',[550,200,800,700])
 
 figure('Name','Pressure Plots')
-plot(BurnTime(1:index-1), intake.stagPres(1,1:index-1)/1e3, BurnTime(1:index-1), intake.chokeStagPres(1:index-1)/1e3, BurnTime(1:index-1), combustion.stagPres(1,1:index-1)/1e3, BurnTime(1:index-1), trajectory.pressure_a(1:index-1)/1e3,BurnTime(1:index-1), intake.stagPres(2,1:index-1)/1e3,BurnTime(1:index-1), intake.stagPres(4,1:index-1)/1e3,BurnTime(1:index-1),intake.MaxAvailableStag(1:index-1)/1e3)%,BurnTime(1:index-1),intake.chokeStagPresTEST(1:index-1)/1e3)
+plot(BurnTime(1:index-1), intake.stagPres(1,1:index-1)/1e3, BurnTime(1:index-1), intake.chokeStagPres(1:index-1)/1e3,'*', BurnTime(1:index-1), combustion.stagPres(1,1:index-1)/1e3, BurnTime(1:index-1), trajectory.pressure_a(1:index-1)/1e3,BurnTime(1:index-1), intake.stagPres(2,1:index-1)/1e3,BurnTime(1:index-1), intake.stagPres(4,1:index-1)/1e3,BurnTime(1:index-1),intake.MaxAvailableStag(1:index-1)/1e3)%,BurnTime(1:index-1),intake.chokeStagPresTEST(1:index-1)/1e3)
 title('Stagnation Pressure Plots')
 xlabel('Time (s)')
 ylabel('Stagnation Pressure (kPa)')
@@ -123,6 +123,41 @@ yyaxis right
 plot(BurnTime, trajectory.Acc_x)
 ylabel('Ax (m/s^2)')
 set(gcf,'position',[550,200,800,700])
+
+%%    geometry plots
+% solve for ramp length
+spikeLength = intake.EnterDiaINCH/2/sind(intake.DeflAngle);
+subDiffuserLength = spikeLength/2;
+totalLength = spikeLength + subDiffuserLength;
+subDiffuserSlope = -(intake.EnterDiaINCH/2)/subDiffuserLength;
+topslopeCowlx = totalLength + ((intake.CowlDiaINCH/2)-(combustion.InletDiaINCH/2))/subDiffuserSlope;  % used to match slope of sub diffuser line to intersect with cowl
+buffer = totalLength/10;
+% solve for shocks
+obliqueShockHgt = sind(intake.shockAngle(1))*spikeLength;
+
+f1 = figure('Name','ramp shock structure');
+hold on
+% plot surfaces
+plot([0,totalLength+buffer],[0,0],':k', 'LineWidth',2);  % centerline
+plot([spikeLength,totalLength+buffer],[(intake.CowlDiaINCH/2),(intake.CowlDiaINCH/2)],'k', 'LineWidth',2);  % cowl line
+plot([0,spikeLength],[0,(intake.EnterDiaINCH/2)], 'k', 'LineWidth',2);  % spike ramp line
+plot([spikeLength,totalLength],[(intake.EnterDiaINCH/2),0], 'k', 'LineWidth',2);  % subsonic diffuser ramp line
+plot([topslopeCowlx,totalLength],[(intake.CowlDiaINCH/2),(combustion.InletDiaINCH/2)], 'k', 'LineWidth',2);  % subsonic top slope ramp line
+plot([totalLength,totalLength],[(combustion.InletDiaINCH/2),(intake.CowlDiaINCH/2)], 'k', 'LineWidth',2);  % combustor inlet
+
+% plot shocks
+plot([0,spikeLength],[0,obliqueShockHgt], '--c');  % oblique shock
+plot([spikeLength,spikeLength],[(intake.EnterDiaINCH/2),(intake.CowlDiaINCH/2)], '--c');  % Normal Shcok
+title('Ramjet Intake Geometry')
+xlabel('<in>')
+ylabel('<in>')
+hold off
+
+
+
+%%
+
+
 
 if (mean(combustion.mach(1)) > 0.2)
     fprintf(2,'\nWARNING: Inlet Mach number is too high.\n')

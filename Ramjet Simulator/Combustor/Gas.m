@@ -21,6 +21,6 @@ vehicle.TotalMassGen(n) = intake.MassGen(n) + fuel.MassGen(n);                  
 combustion.FAR(n) = (fuel.MassGen(n)/intake.MassGen(n));                              % fuel to air ratio 
 
 % --------------------- Chemistry Model --------------------- %
-[combustion.Phi(n), vehicle.AFT(n), nozzle.gamma(n), R_t] = chem.phiSolver(combustion.FAR(n),intake.staticTemp(end,n));     % Call Chemistry Model, need to add T_air before combustion chamber 475
+[combustion.Phi(n), vehicle.AFT(n), nozzle.gamma(n), nozzle.R(n)] = chem.phiSolver(combustion.FAR(n),intake.staticTemp(end,n));     % Call Chemistry Model, need to add T_air before combustion chamber 475
 
 

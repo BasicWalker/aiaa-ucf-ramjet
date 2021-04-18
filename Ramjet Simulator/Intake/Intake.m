@@ -123,7 +123,7 @@ if intake.A_Astar(5,n) < 1
 end
 
 
-[intake.mach(5,n), intake.tempRatio(5,n), intake.presRatio(5,n), intake.densRatio(5,n), ~] = ...
+[intake.mach(5,n), intake.tempRatio(5,n), intake.presRatio(5,n), intake.densRatio(5,n), intake.A_Astar(5,n)] = ...
     flowisentropic(constants.gamma, intake.A_Astar(5,n), 'sub');  % ratios are static over stagnation
 intake.stagPres(5,n) = intake.stagPres(4,n);  % does not change; iscentropic <Pa>
 intake.stagDens(5,n) = intake.stagDens(4,n);  % does not change; iscentropic <kg/m3>

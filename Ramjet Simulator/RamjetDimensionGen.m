@@ -6,9 +6,6 @@ vehicle.DragCoeff = 0.23;  % Drag coefficient (0.35)
 vehicle.FrontSurfArea = 0.008119;  % Frontal surface area (m^2)
 vehicle.DryMass = 6.80389;  % Mass of ramjet without fuelgrain (kg)
 
-% intake -----
-intake.Area_enter = 0.0008;  % Area of throat (m^2) - Drives mass flow rate through intake
-intake.DeflAngle = 10;   % Deflection angle (deg)
 
 % combustion -----
 combustion.InletArea = 0.0064693;  %pi*combustion.InletDia^2*(1/4);  % (m)
@@ -17,6 +14,16 @@ combustion.InletDiaINCH = sqrt(4*combustion.InletArea/pi)* constants.In2Mtr;  % 
 combustion.ChamberArea = combustion.InletArea*1.5;  % 50% larger than inlet area     %pi*combustion.ChamberRadius^2/4; %pi*combustion.ChamberRadius^2;  % Area of combustion chamber (m^2)
 combustion.ChamberDia = sqrt(4*combustion.ChamberArea/pi); %<m>            %2.75 /constants.In2Mtr / 2;  % Radius of the combustion chamber (m)
 combustion.ChamberDiaINCH = sqrt(4*combustion.ChamberArea/pi)* constants.In2Mtr; %<in>
+
+% intake -----
+intake.Area_enter = 0.0007;  % Area of throat (m^2) - Drives mass flow rate through intake
+intake.CowlDia = combustion.ChamberDia;  % <m>
+intake.CowlDiaINCH = intake.CowlDia*constants.In2Mtr;  % <in>
+intake.EnterDia = sqrt(4/pi*(pi*intake.CowlDia^2/4 - intake.Area_enter));  % <m>
+intake.EnterDiaINCH = intake.EnterDia*constants.In2Mtr;  % <in>
+intake.DeflAngle = 15;   % Deflection angle (deg)
+
+
 
 % fuel -----
 fuel.DiaOuter =  combustion.ChamberDia;%2.75 /constants.In2Mtr;  % Grain OD (m)

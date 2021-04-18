@@ -11,13 +11,13 @@
 % ---------------------------------------------------------------------- %    
 
 % iscentropic expansion for step height
-[~, ~, ~, ~, combustion.A_Astar(1,n)] = flowisentropic(constants.gamma, intake.mach(end,n), 'mach');
-combustion.Astar(1,n) = combustion.InletArea / combustion.A_Astar(1,n);
-combustion.A_Astar(2,n) = fuel.PortArea(n) / combustion.Astar(1,n);
+% [~, ~, ~, ~, combustion.A_Astar(1,n)] = flowisentropic(constants.gamma, intake.mach(end,n), 'mach');
+combustion.Astar(1,n) = combustion.InletArea / intake.A_Astar(5,n);
+combustion.A_Astar(1,n) = fuel.PortArea(n) / combustion.Astar(1,n);
 
 % flow Properties at combustor inlet
 [combustion.mach(1,n), combustion.TempRatio(1,n), combustion.PresRatio(1,n), combustion.DensRatio(1,n), ~] = ...
-    flowisentropic(constants.gamma, combustion.A_Astar(2,n), 'sub');  % ratios are static over stagnation
+    flowisentropic(constants.gamma, combustion.A_Astar(1,n), 'sub');  % ratios are static over stagnation
 combustion.stagPres(1,n) = intake.stagPres(end,n);  % does not change; iscentropic <Pa>
 combustion.stagDens(1,n) = intake.stagDens(end,n);  % does not change; iscentropic <kg/m3>
 combustion.stagTemp(1,n) = intake.stagTemp(end,n);  % does not change; iscentropi <K>
@@ -36,6 +36,7 @@ if n == 1 % intial iteration without combustion
     combustion.staticTemp(2,n) = combustion.staticTemp(1,n);  % <K>
     combustion.velocity(2,n) = combustion.velocity(1,n);  % <m/s>
     combustion.massFlow(2,n) = combustion.massFlow(1,n);
+    combustion.mach(2,n) = combustion.mach(1,n);
     combustion.stagPresLoss(n) = 0;
 else
     % use rayleigh flow to solve for properties at combustion chamber exit
@@ -47,8 +48,19 @@ else
     combustion.velocity(2,n) = combustion.mach(2,n)*sqrt(constants.gamma*constants.R*combustion.staticTemp(2,n));
     combustion.massFlow(2,n) = combustion.staticDens(2,n)*combustion.velocity(2,n)*fuel.PortArea(n) + fuel.MassFlow(n);  % add in the fuel mass flow to rayleigh heated air mass flow
 end
+[~, ~, ~, ~, combustion.A_Astar(2,n)] = flowisentropic(constants.gamma, combustion.mach(2,n), 'mach');  % ratios are static over stagnation
+combustion.Astar(2,n) = fuel.PortArea(n) / combustion.A_Astar(2,n);
 % find pressure needed to choke nozzle
 % intake.chokeStagPres(n+1) = pressureToChoke(intake.massFlow(2,n), nozzle.Area_throat, combustion.stagTemp(2,n)) + combustion.stagPresLoss(n);  % choke pressure AFT
-intake.chokeStagPres(n+1) = pressureToChoke(combustion.massFlow(2,n), nozzle.Area_throat, combustion.stagTemp(2,n)) + combustion.stagPresLoss(n);  % choke pressure AFT
+
+if n == 1
+    R = constants.R;
+    gamma = constants.gamma;
+else
+    R = nozzle.R(n);
+    gamma = nozzle.gamma(n);
+end
+
+intake.chokeStagPres(n+1) = pressureToChoke(combustion.massFlow(2,n), nozzle.Area_throat, combustion.stagTemp(2,n),gamma,R) + combustion.stagPresLoss(n);  % choke pressure AFT
 
 

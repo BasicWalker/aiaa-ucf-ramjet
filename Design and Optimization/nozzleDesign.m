@@ -188,7 +188,7 @@ if plotFlag == 1
     [X,Y] = ndgrid(c,d);
     figure(3)
     mesh(X, Y, chamberPres)
-    xlabel('Phi <kg/s>')
+    xlabel('Equivalence Ratio')
     ylabel('Throat Diameter <in>')
     zlabel('Minimum Chamber Pressure to Choke');
     

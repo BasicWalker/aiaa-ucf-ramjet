@@ -1,9 +1,9 @@
 % ---------- SFRJ Numerical Simulation / UCF CAPSTONE PROJECT ---------- %
-% Program Name:  SFRJ Internal Ballistic Simulatior
+% Program Name:  SFRJ Internal Ballistic Simulator
 %
 % Program Description: 
 % This program models and simulates critical performance parameters of a 
-% Solif-Fuel Ramjet. 
+% Solid-Fuel Ramjet. 
 % 
 % File Description:
 % Main executive file.  

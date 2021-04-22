@@ -83,6 +83,7 @@ figure('Name','Trajectory Profile')
 axis equal
 subplot(3,1,1)
 plot(trajectory.X_pos,trajectory.Z_pos)
+ylim([trajectory.Z_pos(1)-10 trajectory.Z_pos(1)+10])
 title('Trajectory')
 xlabel('Range (m)')
 ylabel('Altitude (m)')
@@ -90,6 +91,7 @@ grid on
 subplot(3,1,2)
 plot(BurnTime,trajectory.Z_pos)
 title('Altitude vs Time')
+ylim([trajectory.Z_pos(1)-10 trajectory.Z_pos(1)+10])
 xlabel('Time(s)')
 ylabel('Altitude(m)')
 grid on
@@ -108,9 +110,11 @@ grid on
 title('Vertical Profile (Z)')
 yyaxis left
 plot(BurnTime, trajectory.Vel_z)
+ylim([-10 10])
 ylabel('Vz (m/s)')
 yyaxis right
 plot(BurnTime, trajectory.Acc_z)
+ylim([-10 10])
 ylabel('Az (m/s^2)')
 subplot(2,1,2)
 grid on;
@@ -152,6 +156,7 @@ title('Ramjet Intake Geometry')
 xlabel('<in>')
 ylabel('<in>')
 hold off
+set(gcf,'position',[550,200,800,700])
 
 
 

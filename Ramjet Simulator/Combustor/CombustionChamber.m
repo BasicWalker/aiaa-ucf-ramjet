@@ -10,39 +10,57 @@
 % Karam Paul      04/26/21  000  Initial Creation 
 % ---------------------------------------------------------------------- %    
 
-RegressionRate                              % Call Regression Rate Model
-GrainGeometry                               % Call Instantaneous Grain Geometry Model
-Gas                                         % Call Gas Model (And Chemistry Model)
-BoundaryLayer                               % Call Boundary Layer Model
+% iscentropic expansion for step height
+% [~, ~, ~, ~, combustion.A_Astar(1,n)] = flowisentropic(constants.gamma, intake.mach(end,n), 'mach');
+combustion.Astar(1,n) = combustion.InletArea / intake.A_Astar(5,n);
+combustion.A_Astar(1,n) = fuel.PortArea(n) / combustion.Astar(1,n);
 
-% calculate the expansion for step height
-% cmbMach2*GrainID(n) = InltD
+% flow Properties at combustor inlet
+[combustion.mach(1,n), combustion.TempRatio(1,n), combustion.PresRatio(1,n), combustion.DensRatio(1,n), ~] = ...
+    flowisentropic(constants.gamma, combustion.A_Astar(1,n), 'sub');  % ratios are static over stagnation
+combustion.stagPres(1,n) = intake.stagPres(end,n);  % does not change; iscentropic <Pa>
+combustion.stagDens(1,n) = intake.stagDens(end,n);  % does not change; iscentropic <kg/m3>
+combustion.stagTemp(1,n) = intake.stagTemp(end,n);  % does not change; iscentropi <K>
+combustion.staticPres(1,n) = combustion.stagPres(1,n) * combustion.PresRatio(1,n);  % <Pa>
+combustion.staticDens(1,n) = combustion.stagDens(1,n) * combustion.DensRatio(1,n);  % <kg/m3>
+combustion.staticTemp(1,n) = combustion.stagTemp(1,n) * combustion.TempRatio(1,n);  % <K>
+combustion.velocity(1,n) = combustion.mach(1,n)*sqrt(constants.gamma*constants.R*combustion.staticTemp(1,n));  % <m/s>
+combustion.massFlow(1,n) = combustion.staticDens(1,n)*combustion.velocity(1,n)*fuel.PortArea(n);
 
+if n == 1 % intial iteration without combustion
+    combustion.stagPres(2,n) = combustion.stagPres(1,n);  % does not change; iscentropic <Pa>
+    combustion.stagDens(2,n) = combustion.stagDens(1,n);  % does not change; iscentropic <kg/m3>
+    combustion.stagTemp(2,n) = combustion.stagTemp(1,n);  % does not change; iscentropi <K>
+    combustion.staticPres(2,n) = combustion.staticPres(1,n);  % <Pa>
+    combustion.staticDens(2,n) = combustion.staticDens(1,n);  % <kg/m3>
+    combustion.staticTemp(2,n) = combustion.staticTemp(1,n);  % <K>
+    combustion.velocity(2,n) = combustion.velocity(1,n);  % <m/s>
+    combustion.massFlow(2,n) = combustion.massFlow(1,n);
+    combustion.mach(2,n) = combustion.mach(1,n);
+    combustion.stagPresLoss(n) = 0;
+else
+    % use rayleigh flow to solve for properties at combustion chamber exit
+    [combustion.mach(2,n), combustion.staticTemp(2,n), combustion.staticPres(2,n), combustion.stagTemp(2,n), combustion.stagPres(2,n), combustion.stagPresLoss(n)] = ...
+        RayleighFlow(constants.gamma, combustion.mach(1,n), combustion.stagTemp(1,n), vehicle.AFT(n), combustion.stagPres(1,n));
+    
+    combustion.staticDens(2,n) = combustion.staticPres(2,n)/(combustion.staticTemp(2,n)*constants.R);
+    combustion.stagDens(2,n) = combustion.stagPres(2,n)/(combustion.stagTemp(2,n)*constants.R);
+    combustion.velocity(2,n) = combustion.mach(2,n)*sqrt(constants.gamma*constants.R*combustion.staticTemp(2,n));
+    combustion.massFlow(2,n) = combustion.staticDens(2,n)*combustion.velocity(2,n)*fuel.PortArea(n) + fuel.MassFlow(n);  % add in the fuel mass flow to rayleigh heated air mass flow
+end
+[~, ~, ~, ~, combustion.A_Astar(2,n)] = flowisentropic(constants.gamma, combustion.mach(2,n), 'mach');  % ratios are static over stagnation
+combustion.Astar(2,n) = fuel.PortArea(n) / combustion.A_Astar(2,n);
+% find pressure needed to choke nozzle
+% intake.chokeStagPres(n+1) = pressureToChoke(intake.massFlow(2,n), nozzle.Area_throat, combustion.stagTemp(2,n)) + combustion.stagPresLoss(n);  % choke pressure AFT
 
-[~, ~, ~, ~, ccA_Astar(1,n)] = flowisentropic(gamma, InltMach(n), 'mach');
-Astar(1,n) = InltArea / ccA_Astar(1,n);
-ccA_Astar(2,n) = PortArea(n) / Astar(1,n);
-% 
-% 
-[ccMach(1,n), ccTempRatio(1,n), ccPresRatio(1,n), ccDensRatio(1,n), ~] = ...
-    flowisentropic(gamma, ccA_Astar(2,n), 'sub');  % ratios are static over stagnation
-ccStagPres(1,n) = InltPres_stag(n);  % does not change; iscentropic <Pa>
-ccStagDens(1,n) = InltTemp_dens(n);  % does not change; iscentropic <kg/m3>
-ccStagTemp(1,n) = InltTemp_stag(n);  % does not change; iscentropi <K>
-ccStaticPres(1,n) = ccStagPres(1,n) * ccPresRatio(1,n);  % <Pa>
-ccStaticDens(1,n) = ccStagDens(1,n) * ccDensRatio(1,n);  % <kg/m3>
-ccStaticTemp(1,n) = ccStagTemp(1,n) * ccTempRatio(1,n);  % <K>
-ccVelocity(1,n) = ccMach(1,n)*sqrt(gamma*R*ccStaticTemp(1,n));  % <m/s>
-ccMdot(1,n) = ccStaticDens(1,n)*ccVelocity(1,n)*PortArea(n);
-% 
-% use rayleigh flow to solve for properties at combustion chamber exit
-[ccMach(2,n), ccStaticTemp(2,n), ccStaticPres(2,n), ccStagTemp(2,n), ccStagPres(2,n), ccStagPresLoss(n)] = ...
-    RayleighFlow(1.2, ccMach(1,n), InltTemp_stag(n), T_stag(n), InltPres_stag(n));
+if n == 1
+    R = constants.R;
+    gamma = constants.gamma;
+else
+    R = nozzle.R(n);
+    gamma = nozzle.gamma(n);
+end
 
-ccStaticDens(2,n) = ccStaticPres(2,n)/(ccStaticTemp(2,n)*R);
-ccStagDens(2,n) = ccStagPres(2,n)/(ccStagTemp(2,n)*R);
-ccVelocity(2,n) = ccMach(2,n)*sqrt(1.2*600*ccStaticTemp(2,n));
-ccMdot(2,n) = ccStaticDens(2,n)*ccVelocity(2,n)*PortArea(n);
-
+intake.chokeStagPres(n+1) = pressureToChoke(combustion.massFlow(2,n), nozzle.Area_throat, combustion.stagTemp(2,n),gamma,R) + combustion.stagPresLoss(n);  % choke pressure AFT
 
 

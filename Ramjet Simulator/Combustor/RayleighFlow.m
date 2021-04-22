@@ -6,7 +6,7 @@
 % 
 % Name            Date      SCR  Description
 % --------------  --------  ---  ------------------------------
-% Karam Paul      04/26/21  000  Initial Creation 
+% Karam Paul      03/26/21  000  Initial Creation 
 % ---------------------------------------------------------------------- %
 
 function [mach2, staticTemp2, staticPres2, stagTemp2, stagPres2, stagPresLoss] = ...

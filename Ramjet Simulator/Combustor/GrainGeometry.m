@@ -10,30 +10,23 @@
 % ---------------------------------------------------------------------- %
 
 if n > 1
-    GrainID(n) = GrainID(n-1) + 2 * RgrsPerStp;     % Fuel Grain Inner Diameter (m)
-    PortArea(n) = pi*(GrainID(n)^2)*(1/4);          % Fuel Port Area (m^2)
-    FuelCS(n) = pi*(GrainOD^2)*(1/4) - PortArea(n); % Fuel Grain Crossectional Area (m^2)
-    FuelVol(n) = FuelCS(n) * GrainL;                % Fuel Grain Volume (m^3)
-    FuelSA(n) = GrainID(n)* pi * GrainL;            % Fuel Grain Surface Area (m^2)
+    fuel.DiaInner(n) = fuel.DiaInner(n-1) + 2 * fuel.Regression;     % Fuel Grain Inner Diameter (m)
+    fuel.PortArea(n) = pi*(fuel.DiaInner(n)^2)*(1/4);          % Fuel Port Area (m^2)
+    fuel.CsxArea(n) = pi*(fuel.DiaOuter^2)*(1/4) - fuel.PortArea(n); % Fuel Grain Crossectional Area (m^2)
+    fuel.Volume(n) = fuel.CsxArea(n) * fuel.Length;                % Fuel Grain Volume (m^3)
+    fuel.SurfArea(n) = fuel.DiaInner(n)* pi * fuel.Length;            % Fuel Grain Surface Area (m^2)
 end
 
-StepHeight(n) = (GrainID(n) - InltD)/2;             % Rearward Step Height
+fuel.StepHeight(n) = (fuel.DiaInner(n) - combustion.InletDia)/2;             % Rearward Step Height
 
 % Fuel Mass Properties
-MFuelGen(n) = RgrsPerStp*FuelRho*FuelSA(n);         % Fuel mass generated every time step (kg)
-MdotFuel(n) = MFuelGen(n)/SFRJDt;                   % Fuel mass flow rate (kg/s)
-FuelMass(n) = FuelRho*FuelVol(n);                   % Grain fuel mass, instantaneous (kg)
-
-% Estimate Simulation Run Time
-MaxSimSteps = (GrainOD/2 - GrainID(1)/2)/RgrsPerStp + 1;
-Status = (n/MaxSimSteps)*100;
-if Status > 100
-    Status = 100;
-end
-fprintf('Running... %.2f%%\n',Status)               % Running Simulator indicator
+fuel.MassGen(n) = fuel.Regression*fuel.Density*fuel.SurfArea(n);         % Fuel mass generated every time step (kg)
+fuel.MassFlow(n) = fuel.MassGen(n)/SFRJDt;                   % Fuel mass flow rate (kg/s)
+fuel.Mass(n) = fuel.Density*fuel.Volume(n);                   % Grain fuel mass, instantaneous (kg)
 
 % Stop Simulation Flag
-if GrainID(n) > GrainOD
+if fuel.DiaInner(n) > fuel.DiaOuter
     StopBurn = true;
-    fprintf('Fuel Depleted\n')
+    Burnout = true;
+    index = n;
 end

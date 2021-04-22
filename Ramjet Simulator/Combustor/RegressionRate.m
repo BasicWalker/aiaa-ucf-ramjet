@@ -10,5 +10,9 @@
 % ---------------------------------------------------------------------- %
 
 % Simplified linear regression rate assumption
- BurnRt     = 0.001;         % Burn Rate (m/s)
- RgrsPerStp = BurnRt*SFRJDt; % Regression Per Step (m)
+ if n == 1  % intial iteration without combustion
+     fuel.BurnRate     = 0;         % Burn Rate (m/s)
+ else
+     fuel.BurnRate     = 0.001;         % Burn Rate (m/s)
+ end
+ fuel.Regression = fuel.BurnRate*SFRJDt; % Regression Per Step (m)

@@ -11,6 +11,7 @@
 % Ethan Sherlock  02/14/21  005  1DOF model update
 % Ethan Sherlock  03/12/21  002  Chem model update
 % Ethan Sherlock  04/14/21  ---  2DOF model update
+% Trent Steiner   04/26/21  ---  Added Plots for Thrust and Efficiencies
 % ---------------------------------------------------------------------- %
 
 fprintf('Simulation Complete \n')
@@ -29,6 +30,32 @@ title('Thrust & Drag vs Time')
 xlabel('Time (s)')
 ylabel('Force (N)')
 legend('Thrust Curve','Drag','Weight','Net Force')
+grid on
+set(gcf,'position',[550,200,800,700])
+
+figure('Name','Ramjet Performance')
+axis equal
+subplot(2,1,1)
+plot(BurnTime,vehicle.Specific_Thrust)
+title('Specific Thrust vs Time')
+xlabel('Time (s)')
+ylabel('Specific Thrust (N/(kg/s))')
+grid on
+subplot(2,1,2)
+plot(BurnTime,vehicle.TSFC)
+title('TSFC vs Time')
+xlabel('Time (s)')
+ylabel('TSFC ((kg/s)/N)')
+ylim([1e-5 9e-5])
+grid on
+set(gcf,'position',[550,200,800,700])
+
+figure('Name','Ramjet Efficiencies')
+plot(BurnTime,vehicle.Propulsion_Eff,BurnTime,vehicle.Thermal_Eff,BurnTime,vehicle.Overall_Eff)
+title('Ramjet Efficiencies vs  Time')
+xlabel('Time (s)')
+ylabel('Efficiency')
+legend('Propulsion Efficiency','Thermal Efficiency','Overall Efficiency')
 grid on
 set(gcf,'position',[550,200,800,700])
 

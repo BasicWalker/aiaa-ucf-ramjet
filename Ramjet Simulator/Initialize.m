@@ -7,7 +7,7 @@ fuel.CsxArea(1)           = pi*(fuel.DiaOuter^2)*(1/4) - fuel.PortArea(1);   % F
 fuel.Volume(1)          = fuel.CsxArea(1) * fuel.Length;  % Fuel Grain Volume (m^3)
 fuel.SurfArea(1)           = fuel.DiaInner(1)* pi * fuel.Length;  % Fuel Grain Surface Area (m^2)
 fuel.Mass(1)         = fuel.Density*fuel.Volume(1);  % Grain fuel mass, instantaneous (kg)
-vehicle.TotalMass(1)             = vehicle.DryMass + fuel.Mass(1);  % Mass of Vehicle (Kg)
+vehicle.TotalMass(1) = vehicle.DryMass + fuel.Mass(1);  % Mass of Vehicle (Kg)
 
 % Initialize Chemistry Model
 chem = Chemistry();    
@@ -28,7 +28,7 @@ trajectory.F_tx(1)      = vehicle.thrust(1)*cosd(alpha);                        
 trajectory.F_tz(1)      = vehicle.thrust(1)*sind(alpha);                                            % Thrust Z (N)
 trajectory.F_x(1)       = trajectory.F_tx(1)-trajectory.F_dx(1);                                    % Force X (N)
 trajectory.F_z(1)       = trajectory.F_tz(1)-trajectory.F_dz(1)-vehicle.TotalMass(1)*constants.gravity+trajectory.Lift(1); % Force Z (N)
-trajectory.F_net(1)     = sqrt(trajectory.F_x(n)^2+trajectory.F_z(n)^2);                        % Force (N)
+trajectory.F_net(1)     = sqrt(trajectory.F_x(1)^2+trajectory.F_z(1)^2);                        % Force (N)
 trajectory.Acc(1)       = trajectory.F_net(1)/vehicle.TotalMass(1);                                          % Acceleration (m/s/s)
 trajectory.Acc_x(1)     = trajectory.F_x(1)/vehicle.TotalMass(1);                                            % Acceleration X (m/s/s)
 trajectory.Acc_z(1)     = trajectory.F_z(1)/vehicle.TotalMass(1);                                            % Acceleration Z (m/s/s)

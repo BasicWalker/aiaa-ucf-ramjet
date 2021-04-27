@@ -50,16 +50,15 @@ if n == 1  % intial iteration without combustion
 end
 % chokeStagPres is calculated in combustion when n > 1
 
+% check for choked conditions after normal shock at intake enter (least stagnation pressure loss)
+[~, ~, ~, ~, ~, intake.r_n_chokeLimit(n)] = flownormalshock(constants.gamma, intake.mach(2,n), 'mach');  % ratios are downstream over upstream
+intake.MaxAvailableStag(n) = intake.stagPres(2,n)*intake.r_n_chokeLimit(n);
 
 % check for choked conditions after oblique shock      
 if intake.stagPres(2,n) < intake.chokeStagPres(n)
     warning('intake:obliqueStagLoss',...
-        'Oblique shock stagnation pressure loss too great\ncannot provide enough stagnation pressure; flow is no longer choked. \nTry decreasing altitude, intake.DeflAnglelection angle or increasing speed.');
-end
-% check for choked conditions after normal shock at intake enter (least stagnation pressure loss)
-[~, ~, ~, ~, ~, intake.r_n_chokeLimit(n)] = flownormalshock(constants.gamma, intake.mach(2,n), 'mach');  % ratios are downstream over upstream
-intake.MaxAvailableStag(n) = intake.stagPres(2,n)*intake.r_n_chokeLimit(n);
-if (intake.MaxAvailableStag(n)) < intake.chokeStagPres(n)
+        'Oblique shock stagnation pressure loss too great\ncannot provide enough stagnation pressure; flow is no longer choked. \nTry decreasing altitude, intake.DeflAnglelection angle or increasing speed.')
+elseif (intake.MaxAvailableStag(n)) < intake.chokeStagPres(n)
     warning('intake:normalStagLoss',...
         'Normal shock stagnation pressure loss too great\ncannot provide enough stagnation pressure; flow is no longer choked. \nTry reducing the strength of the normal shock.');
 end

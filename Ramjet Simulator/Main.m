@@ -50,6 +50,8 @@ while StopBurn == 0
         Nozzle                                              % Call Nozzle Model
         Thrust                                              % Call Thrust Model 
         if StopBurn == 1                                    % do not update trajectory since fuel is depleted
+            [~, nozzle.idealIndex] = min(abs(nozzle.exitPressureDifference)); % Mach @ Ideal Expansion
+            nozzle.idealExitMach = intake.mach(1,nozzle.idealIndex);
             break
         end
         Trajectory                                          % Call Trajectory Model

@@ -23,8 +23,6 @@ intake.EnterDia = sqrt(4/pi*(pi*intake.CowlDia^2/4 - intake.Area_enter));  % <m>
 intake.EnterDiaINCH = intake.EnterDia*constants.In2Mtr;  % <in>
 intake.DeflAngle = 15;   % Deflection angle (deg)
 
-
-
 % fuel -----
 fuel.DiaOuter =  combustion.ChamberDia;%2.75 /constants.In2Mtr;  % Grain OD (m)
 fuel.DiaOuterINCH =  combustion.ChamberDia*constants.In2Mtr;
@@ -36,8 +34,9 @@ fuel.Density = 1020;  % Grain Density (kg/m^3)
 
 % nozzle -----
 nozzle.DiaThroat = 1.8 /constants.In2Mtr;  % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
-nozzle.Area_throat = pi*(nozzle.DiaThroat)^2/4;  % Throat area (m^2)
-nozzle.Area_exit = pi*(2.75/constants.In2Mtr)^2/4;  % nozzle exit area (m^2)
+nozzle.Area_throat = (pi/4)*(nozzle.DiaThroat)^2;  % Throat area (m^2)
+nozzle.DiaExit = 3.031632828477959/constants.In2Mtr;
+nozzle.Area_exit = (pi/4)*(nozzle.DiaExit)^2;  % nozzle exit area (m^2)
 
 
 % save workspace variables to mat file

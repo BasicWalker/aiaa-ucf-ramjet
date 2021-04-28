@@ -1,10 +1,7 @@
 clear;close all;clc
 constants.In2Mtr = 39.3701;  % Inch to meter converstion 
 
-% Ramjet Dimensions
-vehicle.DragCoeff = 0.23;  % Drag coefficient (0.35)
-vehicle.FrontSurfArea = 0.008119;  % Frontal surface area (m^2)
-vehicle.DryMass = 6.80389;  % Mass of ramjet without fuelgrain (kg)
+
 
 
 % combustion -----
@@ -35,8 +32,13 @@ fuel.Density = 1020;  % Grain Density (kg/m^3)
 % nozzle -----
 nozzle.DiaThroat = 1.8 /constants.In2Mtr;  % Throat Diameter, assuming exit area is 1.6 in diameter (from HPR), 0.985
 nozzle.Area_throat = (pi/4)*(nozzle.DiaThroat)^2;  % Throat area (m^2)
-nozzle.DiaExit = 3.031632828477959/constants.In2Mtr;
+nozzle.DiaExit = 2.75/constants.In2Mtr;
 nozzle.Area_exit = (pi/4)*(nozzle.DiaExit)^2;  % nozzle exit area (m^2)
+
+% Ramjet Dimensions
+vehicle.DragCoeff = 0.23;  % Drag coefficient (0.35)
+vehicle.FrontSurfArea = combustion.ChamberArea; % 0.008119;  % Frontal surface area (m^2)
+vehicle.DryMass = 6.80389;  % Mass of ramjet without fuelgrain (kg)
 
 
 % save workspace variables to mat file

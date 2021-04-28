@@ -30,27 +30,28 @@ time                = 0.0;                                  % Initialize time (s
 StopBurn            = false;                                % Burn status flag (boolean)
 Burnout             = false;                                % Burn out status flag (boolean)
 
+
+preserve_data = 0;  % boolean to try to recover data if iteration failed, else data stored as NaN
 cnt = 10;  % iteration count
 
 % nozzle -----
-Design.DiaThroatINCHiter = linspace(1.5,10,cnt);  % Throat Diameter <in> 1.8  % iteration parameter ****
-Design.AreaRatioExititer = linspace(1.5,5,cnt); % iteration parameter ****
-
-% combustion -----
-% combustion.InletDiaINCHiter = linspace(2,5,cnt);  % <in>  % iteration parameter ****
-
-
+Design.DiaThroatINCHiter = linspace(1.5,3,cnt);  % Throat Diameter <in> 1.8  % iteration parameter ****
+% Design.DiaThroatINCHiter = linspace(0.5,5,cnt);  % Throat Diameter <in> 1.8  % iteration parameter ****
+Design.AreaRatioExititer = linspace(1,5,cnt); % iteration parameter ****
+% Design.AreaRatioExititer = linspace(1.5,5,cnt); % iteration parameter ****
 
 % intake -----
-Design.AreaRatioEnteriter = linspace(1.5,10,cnt);  % iteration parameter ****
+Design.AreaRatioEnteriter = linspace(1,5,cnt);  % iteration parameter ****
+% Design.AreaRatioEnteriter = linspace(1.5,5,cnt);  % iteration parameter ****
+% Design.AreaEnteriter = linspace(0.01,5,cnt);  % iteration parameter ****
 
 % Design.EnterDiaiter = linspace(0.5,5,cnt);  % iteration parameter ****
 intake.DeflAngle = 15;   % Deflection angle (deg)
 
 % fuel -----
-
 fuel.Length = 15.00 /constants.In2Mtr;  % Grain Length (m)
 fuel.Density = 1020;  % Grain Density (kg/m^3)
+DesignStepHeight = 0.4;  % ratio
 
 % Ramjet Dimensions
 vehicle.DragCoeff = 0.23;  % Drag coefficient (0.35)
@@ -72,12 +73,16 @@ trajectory.LiftOnOff    = 1;  % 0.0 = off; % 1.0 = on
 
 for i=1:numel(Design.DiaThroatINCHiter)
     for j=1:numel(Design.AreaRatioExititer)
-        for k=1:numel(Design.AreaRatioEnteriter) % Design.EnterDiaiter
+        for k=1:numel(Design.AreaRatioEnteriter) % Design.EnterDiaiter Design.AreaEnteriter Design.AreaRatioEnteriter
             n=1;
+            vehicle.Mach(1)         = 2.5;  % Ramjet Initial Mach number
+            trajectory.Z_pos(1)     = 1000.0;  % Initial altitude for ramjet start (m)
             
             nozzle.DiaThroatINCH = Design.DiaThroatINCHiter(i);
             nozzle.AreaRatioExit = Design.AreaRatioExititer(j);
+%             intake.Area_enter = Design.AreaEnteriter(k);
 %             intake.EnterDiaINCH = Design.EnterDiaiter(k);  % <in>
+
             
 
             
@@ -89,63 +94,56 @@ for i=1:numel(Design.DiaThroatINCHiter)
             
             intake.Area_enter = nozzle.Area_throat/Design.AreaRatioEnteriter(k);  % <m^2>
             
-%             intake.EnterDia = intake.EnterDiaINCH/constants.In2Mtr;  % <m>
-%             intake.Area_enter = pi*intake.EnterDia^2/4;  % Area of throat (m^2) - Drives mass flow rate through intake
-            
             
             trajectory.Rho_a(1)     = interp1(GRAM.Hgtkm, GRAM.DensMean, (trajectory.Z_pos(1))/1e3);                % Atmospheric Density (kg/m^3)
             trajectory.pressure_a(1)= interp1(GRAM.Hgtkm, GRAM.PresMean, (trajectory.Z_pos(1))/1e3);                % Atmospheric Pressure (Pa)
             trajectory.Temp_a(1)    = interp1(GRAM.Hgtkm, GRAM.Tmean, (trajectory.Z_pos(1))/1e3);                   % Atmospheric Temperature (K)
-%             
-%             n=1;
-%             % find area needed to slow com bustion chamber to mach 0.15
-%             designmach(1) = vehicle.Mach(n);
-%             designstaticPres(1) = trajectory.pressure_a(n);  % <Pa>
-%             designstaticDens(1) = trajectory.Rho_a(n);  % <kg/m^3>
-%             designstaticTemp(1) = trajectory.Temp_a(n);  % <K>
-%             [~, designtempRatio(1), designpresRatio(1), designdensRatio(1), ~] = flowisentropic(constants.gamma, designmach(1), 'mach');  % ratios are static over stagnation
-%             designstagTemp(1) = designstaticTemp(1)/designtempRatio(1);  % <K>
-%             designstagPres(1) = designstaticPres(1)/designpresRatio(1);  % <Pa>
-%             designstagDens(1) = designstaticDens(1)/designdensRatio(1);  % <kg/m^3>
-%             designvelocity(1) = designmach(1)*sqrt(constants.gamma*constants.R*designstaticTemp(1));  % <m/s>
-%             % Station 2 properties (oblique shock)-----
-%             [designmach(2), designshockAngle(n)] = obliqueShock(designmach(1), intake.DeflAngle, constants.gamma);  % uniform mach number of external ramp region
-%             designmach1Norm(n) = designmach(1)*sind(designshockAngle(n));  % flow component crossing normal to oblique shock
-%             [~, designtempRatio(2), designpresRatio(2), designdensRatio(2), ~, designstagPresRatio(2)] = ...
-%                 flownormalshock(constants.gamma, designmach1Norm(n), 'mach');  % ratios are downstream over upstream
-%             designstagTemp(2) = designstagTemp(1);  % does not change over normal shock <K>
-%             designstagPres(2) = designstagPres(1) * designstagPresRatio(2);  % <Pa>
-%             designstaticDens(2) = designstaticDens(1) * designdensRatio(2);  % <kg/m3>
-%             designstaticTemp(2) = designstaticTemp(1) * designtempRatio(2);  % <K>
-%             designvelocity(2) = designmach(2)*sqrt(constants.gamma*constants.R*designstaticTemp(2));  % <m/s>
-%             [~, ~, ~, ~, designA_Astar(2)] = flowisentropic(constants.gamma, designmach(2), 'mach');
-%             designAstar(2) = intake.Area_enter/designA_Astar(2);  % reference area before normal shock
-%             designmassFlow(2) = designstaticDens(2)*intake.Area_enter*designvelocity(2);  % air mass flow at intake opening <kg/s>
-%             designchokeStagPres(n) = pressureToChoke(designmassFlow(2), nozzle.Area_throat, designstagTemp(2));  % no stag temp change from combustion
-%             designr_n = designchokeStagPres(n)/designstagPres(2);  % total stagnation pressure loss ratio from normal shock
-%             [~, ~, ~, ~, ~, designr_n_chokeLimit(n)] = flownormalshock(constants.gamma, designmach(2), 'mach');
-%             designAstar(4) = designAstar(2)/designr_n_chokeLimit(n);
-%             ideal_combustor_area =  3.91034275*designAstar(4);
+
 
 %             Initialize  % set initial conditions
-% Initialize BurnTime variable (s)
-                        BurnTime(1)         = 0.0;
+            % Initialize BurnTime variable (s)
+            BurnTime(1)         = 0.0;
             StopBurn = 0;
             while StopBurn == 0
                 if n > 3  % stop simulation at 3rd iteration
                     % add variables to track
-                    
-                    Design.Thrust(i,j,k) = vehicle.thrust(3);
+
+                    % store data if 3 iterations ran succsesfully
                     Design.intakemassFlow(i,j,k) = intake.massFlow(2,3);
+                    Design.FreestreamStag(i,j,k) = intake.stagPres(1,3);
                     Design.MaxAvailableStag(i,j,k) = intake.MaxAvailableStag(3);
                     Design.chokeStagPres(i,j,k) = intake.chokeStagPres(3);
                     Design.combustionStagPres(i,j,k) = combustion.stagPres(2,3);
+                    Design.Thrust(i,j,k) = vehicle.thrust(3);
+                    Design.TSFC(i,j,k) = vehicle.TSFC(3);
+                    Design.Specific_Thrust(i,j,k) = vehicle.Specific_Thrust(3);
+                    Design.Phi(i,j,k) = combustion.Phi(3);
+                    Design.AFT(i,j,k) = vehicle.AFT(3);
+                    Design.FuelMassFlow(i,j,k) = fuel.MassFlow(3);
+                    Design.AmbientPressure(i,j,k) = trajectory.pressure_a(1);
+                    Design.NozzleExitPressure(i,j,k) = nozzle.staticPres(2,3);
+                    Design.NozzleExitMach(i,j,k) = nozzle.mach(2,3);
+                    Design.NozzleExitVelocity(i,j,k) = nozzle.velocity(2,3);
+                    Design.StaticTempCombustion(i,j,k) = intake.staticTemp(5,3);
                     
-                    Design.Thrustgood(i,j,k) = 1;
+                    
+                    
+                    % flag data good
                     Design.intakemassFlowgood(i,j,k) = 1;
+                    Design.FreestreamStaggood(i,j,k) = 1;
                     Design.MaxAvailableStaggood(i,j,k) = 1;
                     Design.chokeStagPresgood(i,j,k) = 1;
                     Design.combustionStagPresgood(i,j,k) = 1;
+                    Design.Thrustgood(i,j,k) = 1;
+                    Design.TSFCgood(i,j,k) = 1;
+                    Design.Specific_Thrustgood(i,j,k) = 1;
+                    Design.Phigood(i,j,k) = 1;
+                    Design.AFTgood(i,j,k) = 1;
+                    Design.FuelMassFlowgood(i,j,k) = 1;
+                    Design.AmbientPressuregood(i,j,k) = 1;
+                    Design.NozzleExitPressuregood(i,j,k) = 1;
+                    Design.NozzleExitMachgood(i,j,k) = 1;
+                    Design.NozzleExitVelocitygood(i,j,k) = 1;
                     break
                 end
                 BurnTime(n) = time;                                     % Simulation Time
@@ -153,10 +151,16 @@ for i=1:numel(Design.DiaThroatINCHiter)
                     try
 %                         RegressionRate                                      % Call Regression Rate Model
                         IntakeDesign                                              % Call Intake Model
-                        design.EnterHeight(i,j,k) = intake.EnterDiaINCH;  % <in>
-                        design.CowlHeight(i,j,k) = intake.CowlDiaINCH;  % <in>
-                        design.IntakeArea(i,j,k) = intake.Area_enter*constants.In2Mtr^2;  %  <in^2>
-                        design.ThroatArea(i,j,k) = nozzle.Area_throat*constants.In2Mtr^2;  %  <in^2>
+                        % heights in <in> for plotting
+                        Design.EnterHeight(i,j,k) = intake.EnterDiaINCH;  % <in>
+                        Design.CowlHeight(i,j,k) = intake.CowlDiaINCH;  % <in>
+                        Design.ThroatHeight(i,j,k) = nozzle.DiaThroatINCH;  % <in>
+                        Design.ExitHeight(i,j,k) = nozzle.DiaExitINCH;  % <in>
+
+                        % areas in <in^2> for plotting
+                        Design.IntakeArea(i,j,k) = intake.Area_enter*constants.In2Mtr^2;  %  <in^2>
+                        Design.ThroatArea(i,j,k) = nozzle.Area_throat*constants.In2Mtr^2;  %  <in^2>
+                        Design.ExitArea(i,j,k) = nozzle.Area_exit*constants.In2Mtr^2;  %  <in^2>
 
 
 
@@ -207,148 +211,407 @@ for i=1:numel(Design.DiaThroatINCHiter)
                             break
                         end
                         Trajectory                                          % Call Trajectory Model
+                        
+                        
+                    % try to recover data from failed run for analysis
                     catch ME
-                        fprintf('something went wrong:( %s\n', ME.message);
-                        try
-                            Design.Thrust(i,j,k) = vehicle.thrust(n);
-                        catch
-                            Design.Thrust(i,j,k) = NaN;
-                        end
-                        try
-                            Design.intakemassFlow(i,j,k) = intake.massFlow(2,n);
-                        catch
+%                         fprintf('something went wrong:( %s\n', ME.message);
+                        if preserve_data == 1
+                            try
+                                Design.intakemassFlow(i,j,k) = intake.massFlow(2,n);
+                            catch
+                                Design.intakemassFlow(i,j,k) = NaN;
+                            end
+                            try
+                                Design.FreestreamStag(i,j,k) = intake.stagPres(1,n);
+                            catch
+                                Design.FreestreamStag(i,j,k) = NaN;
+                            end
+                            try
+                                Design.MaxAvailableStag(i,j,k) = intake.MaxAvailableStag(n);
+                            catch
+                                Design.MaxAvailableStag(i,j,k) = NaN;
+                            end
+                            try
+                                Design.chokeStagPres(i,j,k) = intake.chokeStagPres(n);
+                            catch
+                                Design.chokeStagPres(i,j,k) = NaN;
+                            end
+                            try
+                                Design.combustionStagPres(i,j,k) = combustion.stagPres(2,n);
+                            catch
+                                Design.combustionStagPres(i,j,k) = NaN;
+                            end
+                            try
+                                Design.Thrust(i,j,k) = vehicle.thrust(n);
+                            catch
+                                Design.Thrust(i,j,k) = NaN;
+                            end
+                            try
+                                Design.TSFC(i,j,k) = vehicle.TSFC(n);
+                            catch
+                                Design.TSFC(i,j,k) = NaN;
+                            end
+                            try
+                                Design.Specific_Thrust(i,j,k) = vehicle.Specific_Thrust(n);
+                            catch
+                                Design.Specific_Thrust(i,j,k) = NaN;
+                            end
+                            %new
+                            try
+                                Design.FreestreamStag(i,j,k) = intake.stagPres(1,n);
+                            catch
+                                Design.FreestreamStag(i,j,k) = NaN;
+                            end
+                            try
+                                Design.Phi(i,j,k) = combustion.Phi(n);
+                            catch
+                                Design.Phi(i,j,k) = NaN;
+                            end
+                            try
+                                Design.AFT(i,j,k) = vehicle.AFT(n);
+                            catch
+                                Design.AFT(i,j,k) = NaN;
+                            end
+                            try
+                                Design.FuelMassFlow(i,j,k) = fuel.MassFlow(n);
+                            catch
+                                Design.FuelMassFlow(i,j,k) = NaN;
+                            end
+                            try
+                                Design.AmbientPressure(i,j,k) = trajectory.pressure_a(1);
+                            catch
+                                Design.AmbientPressure(i,j,k) = NaN;
+                            end
+                            try
+                                Design.NozzleExitPressure(i,j,k) = nozzle.staticPres(2,n);
+                            catch
+                                Design.NozzleExitPressure(i,j,k) = NaN;
+                            end
+                            try
+                                Design.NozzleExitMach(i,j,k) = nozzle.mach(2,n);
+                            catch
+                                Design.NozzleExitMach(i,j,k) = NaN;
+                            end                            
+                            try
+                                Design.NozzleExitVelocity(i,j,k) = nozzle.velocity(2,n);
+                            catch
+                                Design.NozzleExitVelocity(i,j,k) = NaN;
+                            end                            
+                                                
+                    
+                            
+
+                        else
                             Design.intakemassFlow(i,j,k) = NaN;
-                        end
-                        try
-                            Design.MaxAvailableStag(i,j,k) = intake.MaxAvailableStag(n);
-                        catch
+                            Design.FreestreamStag(i,j,k) = NaN;
                             Design.MaxAvailableStag(i,j,k) = NaN;
-                        end
-                        try
-                            Design.chokeStagPres(i,j,k) = intake.chokeStagPres(n);
-                        catch
                             Design.chokeStagPres(i,j,k) = NaN;
-                        end
-                        try
-                            Design.combustionStagPres(i,j,k) = combustion.stagPres(2,n);
-                        catch
                             Design.combustionStagPres(i,j,k) = NaN;
+                            Design.Thrust(i,j,k) = NaN;
+                            Design.TSFC(i,j,k) = NaN;
+                            Design.Specific_Thrust(i,j,k) = NaN;
+                            Design.Phi(i,j,k) = NaN;
+                            Design.AFT(i,j,k) = NaN;
+                            Design.FuelMassFlow(i,j,k) = NaN;
+                            Design.AmbientPressure(i,j,k) = trajectory.pressure_a(1);
+                            Design.NozzleExitPressure(i,j,k) = NaN;
+                            Design.NozzleExitMach(i,j,k) = NaN;
+                            Design.NozzleExitVelocity(i,j,k) = NaN;
                         end
-                        Design.Thrustgood(i,j,k) = 0;
+                        % flag data bad
                         Design.intakemassFlowgood(i,j,k) = 0;
+                        Design.FreestreamStaggood(i,j,k) = 0;
                         Design.MaxAvailableStaggood(i,j,k) = 0;
                         Design.chokeStagPresgood(i,j,k) = 0;
                         Design.combustionStagPresgood(i,j,k) = 0;
+                        Design.Thrustgood(i,j,k) = 0;
+                        Design.TSFCgood(i,j,k) = 0;
+                        Design.Specific_Thrustgood(i,j,k) = 0;
+                        Design.Phigood(i,j,k) = 0;
+                        Design.AFTgood(i,j,k) = 0;
+                        Design.FuelMassFlowgood(i,j,k) = 0;
+                        Design.AmbientPressuregood(i,j,k) = trajectory.pressure_a(1);
+                        Design.NozzleExitPressuregood(i,j,k) = 0;
+                        Design.NozzleExitMachgood(i,j,k) = 0;
+                        Design.NozzleExitVelocitygood(i,j,k) = 0;
                         break
                     end
                 end
-                time = time + SFRJDt;                                   % Step through simulation time
-                n = n + 1;                                              % Increase Index
+                time = time + SFRJDt;  % Step through simulation time
+                n = n + 1; % Increase Index
             end
             
         end
     end
 end
 clear gamma R
-%% plot trade study results
 
-% for i=1:numel(Design.DiaThroatINCHiter)
-%     for j=1:numel(Design.AreaRatioExititer)
-%         for k=1:numel(Design.EnterDiaiter)
+% plot trade study results
+%% individual studies-------
 
-
+% Entrance
+group = 'Entrance Opening vs. ';
+xname = 'Height <in>';
+indx = floor(cnt/2);
+X = squeeze(Design.CowlHeight(indx,indx,:)) - squeeze(Design.EnterHeight(indx,indx,:));
 figure()
-plot(Design.AreaRatioEnteriter,squeeze(Design.Thrust(1,1,:)));
-xlabel('Entrance Diameter <in>')
-ylabel('Thrust <n>')
-title('entrance dia thrust')
-
-figure()
-plot(Design.AreaRatioEnteriter,squeeze(Design.MaxAvailableStag(1,1,:))/1e3,Design.AreaRatioEnteriter,squeeze(Design.chokeStagPres(1,1,:))/1e3);
-xlabel('Entrance Diameter <in>')
-ylabel('stagnation pressure <kPa>')
-title('entrance dia pressures')
-legend('available stagnation', 'choke stagnation required')
-
-figure()
-plot(Design.DiaThroatINCHiter,squeeze(Design.Thrust(:,1,1)));
-xlabel('Entrance Diameter <in>')
-ylabel('Thrust <n>')
-title('throat diameter thrust')
-
-figure()
-plot(Design.DiaThroatINCHiter,squeeze(Design.MaxAvailableStag(:,1,1))/1e3,Design.DiaThroatINCHiter,squeeze(Design.chokeStagPres(:,1,1))/1e3);
-xlabel('Diameter <in>')
-ylabel('stagnation pressure <kPa>')
-title('throat diameter pressures')
-legend('available stagnation', 'choke stagnation required')
-
-
-
-
-
-
-% entrance Dia vs nozzle throat
-
-[X,Y] = meshgrid(Design.AreaRatioEnteriter,Design.DiaThroatINCHiter);
-xname = 'Entrance Diameter <in>';
-yname = 'throat Diameter <in>';
-group = append(xname,' vs ',yname);
-figure()
-surf(X,Y,squeeze(Design.Thrust(:,1,:)));
+plot(X,squeeze(Design.Thrust(indx,indx,:)));
 xlabel(xname)
-ylabel(yname)
-title('thrust')
+ylabel('Thrust <N>')
+title(append(group, 'thrust'))
 figure()
-surf(X,Y,squeeze(Design.intakemassFlow(:,1,:)));
+plot(X,squeeze(Design.TSFC(indx,indx,:)));
 xlabel(xname)
-ylabel(yname)
-title('massflow')
+ylabel('Thrust specific fuel consumption <Kg/(N*s)>')
+title(append(group, 'TSFC'))
 figure()
-surf(X,Y,squeeze(Design.MaxAvailableStag(:,1,:)),'FaceAlpha',0.2,'FaceColor','r');
-hold on
-surf(X,Y,squeeze(Design.chokeStagPres(:,1,:)),'FaceColor','b');
+plot(X,squeeze(Design.intakemassFlow(indx,indx,:)));
 xlabel(xname)
-ylabel(yname)
-title('Pressures')
-legend('available stagnation', 'choke stagnation required')
+ylabel('Massflow <kg/s>')
+title(append(group, 'Massflow'))
+figure()
+hold on 
+plot(X,squeeze(Design.chokeStagPres(indx,indx,:)),'*');
+plot(X,squeeze(Design.combustionStagPres(indx,indx,:)));
+plot(X,squeeze(Design.MaxAvailableStag(indx,indx,:)));
+plot(X,squeeze(Design.FreestreamStag(indx,indx,:)));
 hold off
-figure()
-surf(X,Y,squeeze(Design.combustionStagPres(:,1,:)));
+legend('pressure required to choke','chamber pressure','available pressure (after shocks)','freestream pressure')
 xlabel(xname)
-ylabel(yname)
-title('combustion stag')
-% 
-% Design.EnterDiaiter
-% % nozzle throat vs nozzle Area ratio --------
-% [X,Y] = meshgrid(Design.DiaThroatINCHiter,Design.AreaRatioExititer);
-% xname = 'throat Diameter <in>';
-% yname = 'nozzle area ratio';
-% group = append(xname,' vs ',yname);
-% figure()
-% surf(X,Y,Design.Thrust(:,:,1));
-% xlabel(xname)
-% ylabel(yname)
-% title('thrust')
-% figure()
-% surf(X,Y,Design.intakemassFlow(:,:,1));
-% xlabel(xname)
-% ylabel(yname)
-% title('massflow')
-% figure()
-% surf(X,Y,Design.MaxAvailableStag(:,:,1));
-% xlabel(xname)
-% ylabel(yname)
-% title(append('available Stag')
-% figure()
-% surf(X,Y,Design.chokeStagPres(:,:,1));
-% xlabel(xname)
-% ylabel(yname)
-% title('choke pressure')
-% figure()
-% surf(X,Y,Design.combustionStagPres(:,:,1));
-% xlabel(xname)
-% ylabel(yname)
-% title('combustion stag')
-%
+ylabel('Pressure (stag) <Pa>')
+title(append(group, 'Pressures'))
+figure()
+plot(X,squeeze(Design.CowlHeight(indx,indx,:)));
+xlabel(xname)
+ylabel('Outer Diameter  <in>')
+title(append(group, 'Ramjet Outer Diameter'))
+
+
+% Throat
+group = 'Nozzle Throat Diameter vs. ';
+xname = 'Diameter <in>';
+X = squeeze(Design.ThroatHeight(:,indx,indx));
+figure()
+plot(X,squeeze(Design.Thrust(:,indx,indx)));
+xlabel(xname)
+ylabel('Thrust <N>')
+title(append(group, 'thrust'))
+figure()
+plot(X,squeeze(Design.TSFC(:,indx,indx)));
+xlabel(xname)
+ylabel('Thrust specific fuel consumption <Kg/(N*s)>')
+title(append(group, 'TSFC'))
+figure()
+plot(X,squeeze(Design.intakemassFlow(:,indx,indx)));
+xlabel(xname)
+ylabel('Massflow <kg/s>')
+title(append(group, 'Massflow'))
+figure()
+hold on 
+plot(X,squeeze(Design.chokeStagPres(:,indx,indx)),'*');
+plot(X,squeeze(Design.combustionStagPres(:,indx,indx)));
+plot(X,squeeze(Design.MaxAvailableStag(:,indx,indx)));
+plot(X,squeeze(Design.FreestreamStag(:,indx,indx)));
+hold off
+legend('pressure required to choke','chamber pressure','available pressure (after shocks)','freestream pressure')
+xlabel(xname)
+ylabel('Pressure (stag) <Pa>')
+title(append(group, 'Pressures'))
+figure()
+plot(X,squeeze(Design.CowlHeight(:,indx,indx)));
+xlabel(xname)
+ylabel('Outer Diameter  <in>')
+title(append(group, 'Ramjet Outer Diameter'))
+figure()
+plot(X,(squeeze(Design.CowlHeight(:,indx,indx)) - squeeze(Design.EnterHeight(:,indx,indx))));
+xlabel(xname)
+ylabel('Opening height  <in>')
+title(append(group, 'Entrance Opening'))
+figure()
+plot(X,squeeze(Design.IntakeArea(:,indx,indx)));
+xlabel(xname)
+ylabel('entrance area  <in^2>')
+title(append(group, 'Entrance Area'))
+% freestyle
+figure()
+plot(X,squeeze(Design.IntakeArea(:,indx,indx)),X,squeeze(Design.ThroatArea(:,indx,indx)),X,squeeze(Design.ExitArea(:,indx,indx)));
+xlabel(xname)
+ylabel('area <in^2>')
+legend('intake area','throat area','exit area')
+title(append(group, 'Exit Velocity'))
+
+
+% Exit
+group = 'Exit Diameter vs. ';
+xname = 'Diameter <in>';
+X = squeeze(Design.ExitHeight(indx,:,indx));
+figure()
+plot(X,squeeze(Design.Thrust(indx,:,indx)));
+xlabel(xname)
+ylabel('Thrust <N>')
+title(append(group, 'thrust'))
+figure()
+plot(X,squeeze(Design.TSFC(indx,:,indx)));
+xlabel(xname)
+ylabel('Thrust specific fuel consumption <Kg/(N*s)>')
+title(append(group, 'TSFC'))
+figure()
+plot(X,squeeze(Design.NozzleExitMach(indx,:,indx)));
+xlabel(xname)
+ylabel('mach number')
+title(append(group, 'Exit Mach'))
+figure()
+plot(X,squeeze(Design.NozzleExitVelocity(indx,:,indx)));
+xlabel(xname)
+ylabel('velocity <m/s>')
+title(append(group, 'Exit Velocity'))
+figure()
+hold on 
+plot(X,squeeze(Design.AmbientPressure(indx,:,indx)),'*');
+plot(X,squeeze(Design.NozzleExitPressure(indx,:,indx)));
+hold off
+legend('ambient pressure', 'exit pressure')
+xlabel(xname)
+ylabel('Pressure (static) <Pa>')
+title(append(group, 'Pressures'))
+
+%% 2 dimension trade studies-------
+
+% -- entrance vs nozzle throat
+indx = floor(cnt/2);
+entrance_opening = squeeze(Design.CowlHeight(indx,indx,:)) - squeeze(Design.EnterHeight(indx,indx,:));
+[X,Y] = ndgrid(squeeze(Design.ThroatHeight(:,indx,indx)),entrance_opening);  % Design.IntakeArea
+xname = 'throat Diameter';
+yname = 'Entrance Opening';
+xunit = ' <in>';
+yunit = ' <in>';
+group = append(xname,' vs ',yname);
+% thrust
+figure()
+surf(X,Y,squeeze(Design.Thrust(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('thrust <N>')
+title(append(group,' vs Thrust'))
+% TSFC
+figure()
+surf(X,Y,squeeze(Design.TSFC(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('TSFC <Kg/(N*s)>')
+title(append(group,' vs TSFC'))
+% specific thrust
+figure()
+surf(X,Y,squeeze(Design.Specific_Thrust(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('specific thrust <(N*s)/Kg>')
+title(append(group,' vs Specific Thrust'))
+% air massflow
+figure()
+surf(X,Y,squeeze(Design.intakemassFlow(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('massflow <Kg/s>')
+title(append(group,' vs Air Massflow'))
+% fuel massflow
+figure()
+surf(X,Y,squeeze(Design.FuelMassFlow(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('massflow <Kg/s>')
+title(append(group,' vs Fuel Massflow'))
+% pressure
+figure()
+surf(X,Y,squeeze(Design.MaxAvailableStag(:,indx,:)),'FaceAlpha',0.2,'FaceColor','r');
+hold on
+surf(X,Y,squeeze(Design.chokeStagPres(:,indx,:)),'FaceColor','b');
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('pressure (stag) <Pa>')
+title(append(group,' vs Pressures'))
+legend('available stagnation (after shock)', 'choke stagnation required')
+hold off
+% Equivalence Ratio
+figure()
+surf(X,Y,squeeze(Design.Phi(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('\phi')
+title(append(group,' vs Equivalence Ratio'))
+% AFT
+figure()
+surf(X,Y,squeeze(Design.AFT(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('Temperature <K>')
+title(append(group,' vs Adiabatic Flame Temperature'))
+% chamber size
+figure()
+surf(X,Y,squeeze(Design.CowlHeight(:,indx,:)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('Outer Diameter <in>')
+title(append(group,' vs Ramjet Outer Diameter'))
+
+
+
+% -- nozzle throat vs Exit Diameter
+[X,Y] = ndgrid(squeeze(Design.ThroatHeight(:,indx,indx)),squeeze(Design.ExitHeight(indx,:,indx)));
+xname = 'throat Diameter';
+yname = 'exit Diameter';
+xunit = ' <in>';
+yunit = ' <in>';
+group = append(xname,' vs ',yname);
+% thrust
+figure()
+surf(X,Y,squeeze(Design.Thrust(:,:,indx)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('thrust <N>')
+title(append(group,' vs Thrust'))
+% TSFC
+figure()
+surf(X,Y,squeeze(Design.TSFC(:,:,indx)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('TSFC <Kg/(N*s)>')
+title(append(group,' vs TSFC'))
+% specific thrust
+figure()
+surf(X,Y,squeeze(Design.Specific_Thrust(:,:,indx)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('specific thrust <(N*s)/Kg>')
+title(append(group,' vs Specific Thrust'))
+% pressure
+figure()
+surf(X,Y,squeeze(Design.AmbientPressure(:,:,indx)),'FaceAlpha',0.2,'FaceColor','r');
+hold on
+surf(X,Y,squeeze(Design.NozzleExitPressure(:,:,indx)),'FaceColor','b');
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('pressure (static) <Pa>')
+title(append(group,' vs Pressures'))
+legend('ambient pressure', 'exit pressure')
+hold off
+% mach
+figure()
+surf(X,Y,squeeze(Design.NozzleExitMach(:,:,indx)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('mach number')
+title(append(group,' vs Exit Mach'))
+% velocity
+figure()
+surf(X,Y,squeeze(Design.NozzleExitVelocity(:,:,indx)));
+xlabel(append(xname, xunit))
+ylabel(append(yname, yunit))
+zlabel('velocity <m/s>')
+title(append(group,' vs Exit Velocity'))
+
+
+
+                    
 

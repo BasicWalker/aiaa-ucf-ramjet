@@ -155,6 +155,15 @@ plot(BurnTime, trajectory.Acc_x)
 ylabel('Ax (m/s^2)')
 set(gcf,'position',[550,200,800,700])
 
+figure('Name','ideal pressure difference')
+plot(vehicle.Mach(1:index-1),nozzle.exitPressureDifference(1:index-1))
+title('Mach number vs. Exit pressure difference')
+xlabel('Mach Number')
+ylabel('Pressure difference <Pa>')
+grid on
+
+
+
 %%    geometry plots
 % solve for ramp length
 spikeLength = intake.EnterDiaINCH/2/sind(intake.DeflAngle);

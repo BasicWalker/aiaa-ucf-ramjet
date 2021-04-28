@@ -20,6 +20,7 @@ addpath(genpath(pwd))
 addpath('..\Common Resources')
 tic
 % Import data
+RamjetDimensionGen % update ramjet dimensions
 load RamjetDimensions.mat  % load in the ramjet design
 load GRAM_Model.mat  % GRAM atmospheric model
 load Constants.mat  % load in constants and conversions
